@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="CS_445_RideshareProject">
+        <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <property name="context-root" value="CS_445_RideshareProject"/>
+        <property name="java-output-path" value="/CS_445_RideshareProject/build/classes"/>
+    </wb-module>
+</project-modules>
