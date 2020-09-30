@@ -135,7 +135,7 @@ public class REST_Controller {
 		
 		try {
 			String phone_number = json.getString("phone"); 
-			if(phone_number.compareTo("") == 0)
+			if(phone_number.compareTo("") == 0 || DataPatternFormatter.validatePhoneNumber(phone_number) == -1)
 				return error_code = 3;
 		}
 		catch(NullPointerException e) {
