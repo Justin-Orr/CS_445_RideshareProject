@@ -3,7 +3,10 @@ package com.company.myapp;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
+import com.google.gson.JsonParser;
+
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
@@ -24,11 +27,17 @@ public class REST_Controller {
     }
 	
 	@Path("/accounts")
-	@GET
+	@POST
+	@Consumes("application/json")
 	@Produces("text/plain")
-	public Response createAccount() {
-		String first_name = "John"; String last_name = "Doe"; 
-		String phone_number = "708-123-4567"; String picture = "www.example.com/pic.jpeg";
+	public Response createAccount(@Context UriInfo uriInfo, String json) {
+		JsonReader jsonReader = Json.createReader(new StringReader(json));
+		JsonObject jsonObject = jsonReader.readObject();
+		jsonReader.close();
+		String first_name = jsonObject.getString("first_name").toString(); 
+		String last_name = jsonObject.getString("last_name").toString(); 
+		String phone_number = jsonObject.getString("phone").toString(); 
+		String picture = jsonObject.getString("picture").toString();
 		Account a = new Account(first_name, last_name, phone_number, picture);
 		
 		JsonObject obj = Json.createObjectBuilder().add("aid", a.getID()).build();
@@ -48,7 +57,10 @@ public class REST_Controller {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		//System.out.println(jsonString);
+		
+		// Build the URI for the "Location:" header
+		UriBuilder builder = uriInfo.getAbsolutePathBuilder();
+		builder.path(Integer.toString(a.getID()));
 		
 		return Response.status(Response.Status.OK).entity(jsonString).build();
 	}
