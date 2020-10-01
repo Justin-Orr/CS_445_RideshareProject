@@ -65,6 +65,10 @@ public class AccountRepository implements AccountBoundaryInterface {
 		return a;
 	}
 	
+	public void updateAccount(Account a, JSONObject obj) {
+		
+	}
+	
 	public int activateAccount(int aid) {
 		Account a = getAccount(aid);
 		if(a == null) {
@@ -72,6 +76,7 @@ public class AccountRepository implements AccountBoundaryInterface {
 		}
 		else {
 			a.setActive(true);
+			updateAccount(a);
 			return 0;
 		}
 	}
