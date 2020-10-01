@@ -3,6 +3,7 @@ package com.company.myapp;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -28,34 +29,6 @@ public class REST_Controller {
         String s = "Working properly";
         return Response.status(Response.Status.OK).entity(s).build();
     }
-	
-	/*@Path("/accounts")
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response createAccount(@Context UriInfo uriInfo, String json) {
-		
-		JSONObject jsonObject = new JSONObject(json);
-		
-		String output = "";
-		
-		String first_name = jsonObject.getString("first_name"); 
-		String last_name = jsonObject.getString("last_name"); 
-		String phone_number = jsonObject.getString("phone"); 
-		String picture = jsonObject.getString("picture");
-		int id = abi.creatAccount(first_name, last_name, phone_number, picture);
-		
-		//Create response json
-		JSONObject obj = new JSONObject();
-		obj.put("aid", id);
-		output = obj.toString();
-		 
-		// Build the URI for the "Location:" header
-		UriBuilder builder = uriInfo.getAbsolutePathBuilder();
-		builder.path(Integer.toString(id));
-		
-		return Response.status(Response.Status.OK).entity(output).build();
-	}*/
 	
 	@Path("/accounts")
 	@POST
@@ -126,7 +99,7 @@ public class REST_Controller {
 			return Response.status(Response.Status.NOT_FOUND).entity(output).build();
 		}
 		else {
-			output = new JSONObject(a).toString();
+			output = a.toPrettyJson().toString();
 			return Response.status(Response.Status.OK).entity(output).build();
 		}
 	}
@@ -221,7 +194,7 @@ public class REST_Controller {
 			if(first_name.compareTo("") == 0)
 				return error_code = 1;
 		}
-		catch(NullPointerException e) {
+		catch(NullPointerException | JSONException e ) {
 			return error_code = 1;
 		}
 		
@@ -230,7 +203,7 @@ public class REST_Controller {
 			if(last_name.compareTo("") == 0)
 				return error_code = 2;
 		}
-		catch(NullPointerException e) {
+		catch(NullPointerException | JSONException e) {
 			return error_code = 2;
 		}
 		
@@ -239,7 +212,7 @@ public class REST_Controller {
 			if(phone_number.compareTo("") == 0 || DataPatternFormatter.validatePhoneNumber(phone_number) == -1)
 				return error_code = 3;
 		}
-		catch(NullPointerException e) {
+		catch(NullPointerException | JSONException e) {
 			return error_code = 3;
 		}
 		
@@ -248,14 +221,14 @@ public class REST_Controller {
 			if(picture.compareTo("") == 0)
 				return error_code = 4;
 		}
-		catch(NullPointerException e) {
+		catch(NullPointerException | JSONException e) {
 			return error_code = 4;
 		}
 		
 		try {
 			boolean is_active = json.getBoolean("is_active");
 		}
-		catch(NullPointerException e) {
+		catch(NullPointerException | JSONException e) {
 			return error_code = 5;
 		}
 	

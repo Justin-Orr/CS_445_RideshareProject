@@ -52,7 +52,7 @@ public class Account {
 		JSONObject obj = new JSONObject();
 		obj.put("aid", aid);
 		obj.put("name", firstName + " " + lastName);
-		//obj.add("date_created", date_created);
+		obj.put("date_created", dateCreated);
 		obj.put("is_active", isActive);
 		
 		return obj;

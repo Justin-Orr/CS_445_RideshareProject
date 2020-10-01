@@ -52,10 +52,11 @@ public class AccountRepository implements AccountBoundaryInterface {
 			JSONObject ja = new JSONObject(); 
 			while(tokenizer.more()) {
 				ja = (JSONObject) tokenizer.nextValue();
-				if(ja.getInt("aid") == aid)
+				if(ja.getInt("aid") == aid) {
+					a = Account.jsonToAccount(ja);
 					break;
+				}
 			}
-			a = Account.jsonToAccount(ja);
 		}
 		catch (FileNotFoundException e) {
 			e.printStackTrace();
