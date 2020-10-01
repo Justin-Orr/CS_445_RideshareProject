@@ -17,17 +17,15 @@ import org.json.JSONTokener;
 public class AppTest {
 
 	public static void main(String[] args) {
-		AccountRepository ar = new AccountRepository();
-		ar.creatAccount("John", "Doe", "708-600-8360", "www.example.com/pic.jpeg");
-		//test2();
+		System.out.println(TimeStamp.stamp());
 	}
 	
 	public static void test1() {
 		Account a = new Account("John", "Doe", "708-600-8360", "www.example.com/pic.jpeg");
 		Account b = new Account("Dane", "Doe", "708-600-8360", "www.example.com/pic.jpeg");
 		
-		JSONObject ja = a.toJson();
-		JSONObject jb = b.toJson();
+		JSONObject ja = a.toPrettyJson();
+		JSONObject jb = b.toPrettyJson();
 		
 		//Write to JSON file
 		try (FileWriter file = new FileWriter("accounts.json")) {
@@ -57,8 +55,8 @@ public class AppTest {
 		Account a = new Account("John", "Doe", "708-600-8360", "www.example.com/pic.jpeg");
 		Account b = new Account("Dane", "Doe", "708-600-8360", "www.example.com/pic.jpeg");
 		
-		JSONObject ja = a.toJson();
-		JSONObject jb = b.toJson();
+		JSONObject ja = a.toPrettyJson();
+		JSONObject jb = b.toPrettyJson();
 		System.out.println("Present Project Directory : "+ System.getProperty("user.dir"));
 		String path = "" + System.getProperty("user.dir") + "\\src\\com\\company\\myapp\\";
 		System.out.println(path + "accounts.json");

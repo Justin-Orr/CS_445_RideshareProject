@@ -8,10 +8,10 @@ import org.json.JSONObject;
 
 public class Account {
 	
-	private int aid, number_of_ratings;
-	private double average_rating;
-	private boolean is_active;
-	private String account_type, first_name, last_name, phone_number, picture, date_created;
+	private int aid, numberOfRatings;
+	private double averageRating;
+	private boolean isActive;
+	private String accountType, firstName, lastName, phoneNumber, picture, dateCreated;
 	private Vehicle vehicle;
 	
 	public Account() {
@@ -20,43 +20,43 @@ public class Account {
 	
 	public Account(String first_name, String last_name, String phone_number, String picture) {
 		this.aid = UniqueIdGenerator.getUniqueID();
-		this.number_of_ratings = 0;
-		this.average_rating = 0;
-		this.is_active = false;
-		this.account_type = "unset";
-		this.first_name = first_name; 
-		this.last_name = last_name;
-		this.phone_number = phone_number;
+		this.numberOfRatings = 0;
+		this.averageRating = 0;
+		this.isActive = false;
+		this.accountType = "unset";
+		this.firstName = first_name; 
+		this.lastName = last_name;
+		this.phoneNumber = phone_number;
 		this.picture = picture;
 		this.vehicle = new Vehicle();
-		//this.date_created = TimeStamp.stamp();
-		this.date_created = "DD-MMM-YYYY, HH:MM";
-	}
-	
-	public JSONObject toJson() {
-		/*JsonObjectBuilder obj = Json.createObjectBuilder();
-		obj.add("aid", aid);
-		obj.add("name", first_name + " " + last_name);
-		//obj.add("date_created", date_created);
-		obj.add("is_active", is_active);
-		JsonObject jsonObject = obj.build();
-		return jsonObject;*/
-		JSONObject obj = new JSONObject();
-		obj.put("aid", aid);
-		obj.put("name", first_name + " " + last_name);
-		//obj.add("date_created", date_created);
-		obj.put("is_active", is_active);
-		
-		return obj;
+		this.dateCreated = TimeStamp.stamp();
+		//this.dateCreated = "DD-MMM-YYYY, HH:MM";
 	}
 	
 	public static Account jsonToAccount(JSONObject json) {
-		String first_name = json.getString("first_name");
-		String last_name = json.getString("last_name");
-		String phone_number = json.getString("phone_number");
-		String picture = json.getString("picture");
-		Account a = new Account(first_name, last_name, phone_number, picture);
+		Account a = new Account();
+		a.setAid(json.getInt("aid"));
+		a.setNumberOfRatings(json.getInt("numberOfRatings"));
+		a.setAverageRating(json.getDouble("averageRating"));
+		a.setActive(json.getBoolean("active"));
+		a.setAccountType(json.getString("accountType"));
+		a.setFirstName(json.getString("firstName"));
+		a.setLastName(json.getString("lastName"));
+		a.setPhoneNumber(json.getString("phoneNumber"));
+		a.setPicture(json.getString("picture"));
+		a.setDateCreated(json.getString("dateCreated"));
+		a.setVehicle(Vehicle.jsonToVehicle(json.getJSONObject("vehicle")));
 		return a;
+	}
+	
+	public JSONObject toPrettyJson() {
+		JSONObject obj = new JSONObject();
+		obj.put("aid", aid);
+		obj.put("name", firstName + " " + lastName);
+		//obj.add("date_created", date_created);
+		obj.put("is_active", isActive);
+		
+		return obj;
 	}
 	
 	public int activateAccount(String type) {
@@ -70,102 +70,102 @@ public class Account {
 	
 	public int activateDriver() {
 		//Place method call here to ping user to grab vehicle data
-		is_active = true;
+		isActive = true;
 		vehicle = new Vehicle();
 		return 0;
 	}
 	
 	public int activateRider() {
-		is_active = true;
+		isActive = true;
 		return 0;
 	}
 	
-	public int getID() {
+	public int getAid() {
 		return aid;
 	}
-	
-	public void setID(int id) {
-		this.aid = id;
+
+	public void setAid(int aid) {
+		this.aid = aid;
 	}
-	
+
+	public int getNumberOfRatings() {
+		return numberOfRatings;
+	}
+
+	public void setNumberOfRatings(int numberOfRatings) {
+		this.numberOfRatings = numberOfRatings;
+	}
+
+	public double getAverageRating() {
+		return averageRating;
+	}
+
+	public void setAverageRating(double averageRating) {
+		this.averageRating = averageRating;
+	}
+
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
+	}
+
+	public String getAccountType() {
+		return accountType;
+	}
+
+	public void setAccountType(String accountType) {
+		this.accountType = accountType;
+	}
+
 	public String getFirstName() {
-		return first_name;
+		return firstName;
 	}
-	
-	public void setFirstName(String name) {
-		this.first_name = name;
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
-	
+
 	public String getLastName() {
-		return last_name;
+		return lastName;
 	}
-	
-	public void setLastName(String name) {
-		this.last_name = name;
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
-	
+
 	public String getPhoneNumber() {
-		return this.phone_number;
+		return phoneNumber;
 	}
-	
-	public void setPhoneNumber(String number) {
-		this.phone_number = number;
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
 	}
-	
+
 	public String getPicture() {
-		return this.picture;
+		return picture;
 	}
-	
+
 	public void setPicture(String picture) {
 		this.picture = picture;
 	}
-	
+
 	public String getDateCreated() {
-		return this.date_created;
+		return dateCreated;
 	}
-	
-	public void setDateCreated(String date) {
-		this.date_created = date;
-	}
-	
-	public boolean isActive() {
-		return this.is_active;
-	}
-	
-	public void setActive(boolean b) {
-		this.is_active = b;
-	}
-	
-	public int getNumberOfRatings() {
-		return this.number_of_ratings;
-	}
-	
-	public void setNumberOfRatings(int num) {
-		this.number_of_ratings = num;
-	}
-	
-	public double getAverageRating() {
-		return this.average_rating;
-	}
-	
-	public void setAverageRating(double num) {
-		this.average_rating = num;
-	}
-	
-	public String getAccountType() {
-		return this.account_type;
-	}
-	
-	public void setAccountType(String type) {
-		this.account_type = type;
+
+	public void setDateCreated(String dateCreated) {
+		this.dateCreated = dateCreated;
 	}
 
 	public Vehicle getVehicle() {
-		return this.vehicle;
+		return vehicle;
 	}
-	
-	public void setVehicle(Vehicle v) {
-		this.vehicle = v;
+
+	public void setVehicle(Vehicle vehicle) {
+		this.vehicle = vehicle;
 	}
 
 }

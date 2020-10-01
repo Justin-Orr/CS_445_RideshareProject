@@ -6,6 +6,7 @@ import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.File;
 
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -15,13 +16,14 @@ public class AccountRepository implements AccountBoundaryInterface {
 	String file_path;
 	
 	public AccountRepository() {
-		file_path = System.getProperty("catalina.base") + "\\accounts.json";
+		///The File.separator is to accommodate forward and backslashes based on the operating system.
+		file_path = System.getProperty("catalina.base") + File.separator + "accounts.json";
 	}
 	
 	public int creatAccount(String first_name, String last_name, String phone, String picture) {
 		Account a = new Account(first_name, last_name, phone, picture);
 		writeAccountToFile(a);
-		return a.getID();
+		return a.getAid();
 	}
 	
 	private int writeAccountToFile(Account a) {

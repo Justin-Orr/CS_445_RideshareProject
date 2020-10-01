@@ -29,45 +29,7 @@ public class REST_Controller {
         return Response.status(Response.Status.OK).entity(s).build();
     }
 	
-	private JsonObject stringToJsonObject(String json) {
-		JsonReader jsonReader = Json.createReader(new StringReader(json));
-		JsonObject jsonObject = jsonReader.readObject();
-		jsonReader.close();
-		return jsonObject;
-	}
-	
-	private String jsonToString(JsonObject jsonObject) {
-		Map<String, Boolean> config = new HashMap<>();
-		 
-		config.put(JsonGenerator.PRETTY_PRINTING, true);
-		        
-		JsonWriterFactory writerFactory = Json.createWriterFactory(config);
-		        
-		String jsonString = "";
-		 
-		try(Writer writer = new StringWriter()) {
-		    writerFactory.createWriter(writer).write(jsonObject);
-		    jsonString = writer.toString();
-		}
-		catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		return jsonString;
-	}
-	
-	private String validationErrorResponse(String detail, String instance, int status) {
-		JsonObjectBuilder obj = Json.createObjectBuilder();
-		obj.add("type", "http://cs.iit.edu/~virgil/cs445/project/api/problems/data-validation");
-		obj.add("title", "Your request data didn't pass validation");
-		obj.add("detail", detail);
-		obj.add("status", status);
-		obj.add("instance", instance);
-		JsonObject jsonObject = obj.build();
-		return jsonToString(jsonObject);
-	}
-	
-	@Path("/accounts")
+	/*@Path("/accounts")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -83,6 +45,7 @@ public class REST_Controller {
 		String picture = jsonObject.getString("picture");
 		int id = abi.creatAccount(first_name, last_name, phone_number, picture);
 		
+		//Create response json
 		JSONObject obj = new JSONObject();
 		obj.put("aid", id);
 		output = obj.toString();
@@ -92,18 +55,18 @@ public class REST_Controller {
 		builder.path(Integer.toString(id));
 		
 		return Response.status(Response.Status.OK).entity(output).build();
-	}
+	}*/
 	
-	/*@Path("/accounts")
+	@Path("/accounts")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces("text/plain")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response createAccount(@Context UriInfo uriInfo, String json) {
 		
-		JsonObject jsonObject = stringToJsonObject(json);
+		JSONObject jsonObject = new JSONObject(json);
 		
 		int error_code = validAccountJson(jsonObject);
-		String output = "";
+		String output;
 		
 		if(error_code == 0) {
 			String first_name = jsonObject.getString("first_name"); 
@@ -111,106 +74,62 @@ public class REST_Controller {
 			String phone_number = jsonObject.getString("phone"); 
 			String picture = jsonObject.getString("picture");
 			int id = abi.creatAccount(first_name, last_name, phone_number, picture);
-			System.out.println(repo);
 			
-			JsonObject obj = Json.createObjectBuilder().add("aid", id).build();
-			output = jsonToString(obj);
+			//Create response json
+			JSONObject obj = new JSONObject();
+			obj.put("aid", id);
+			output = obj.toString();
 			 
 			// Build the URI for the "Location:" header
 			UriBuilder builder = uriInfo.getAbsolutePathBuilder();
 			builder.path(Integer.toString(id));
+			
+			return Response.status(Response.Status.OK).entity(output).build();
 		}
 		else if(error_code == 1) {
-			output = validationErrorResponse("Invalid first name", "/accounts", 400);
+			output = validationErrorResponse("Invalid first name", "/accounts", 400).toString();
 			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
 		}
-		else if(error_code == 1) {
-			output = validationErrorResponse("Invalid last name", "/accounts", 400);
+		else if(error_code == 2) {
+			output = validationErrorResponse("Invalid last name", "/accounts", 400).toString();
 			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
 		}
-		else if(error_code == 1) {
-			output = validationErrorResponse("Invalid phone number", "/accounts", 400);
+		else if(error_code == 3) {
+			output = validationErrorResponse("Invalid phone number", "/accounts", 400).toString();
 			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
 		}
-		else if(error_code == 1) {
-			output = validationErrorResponse("Invalid picture URL/filetype", "/accounts", 400);
+		else if(error_code == 4) {
+			output = validationErrorResponse("Invalid picture URL/filetype", "/accounts", 400).toString();
 			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
 		}
-		else if(error_code == 1) {
-			output = validationErrorResponse("Invalid value for is_active", "/accounts", 400);
+		else if(error_code == 5) {
+			output = validationErrorResponse("Invalid value for is_active", "/accounts", 400).toString();
 			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
 		}
-		return Response.status(Response.Status.OK).entity(output).build();
-	}*/
+		else {
+			output = validationErrorResponse("Unhandled_error_code", "/accounts", 500).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
 	
-	/*public int validAccountJson(JSONObject json) {
-		
-		@SuppressWarnings("unused")
-		int error_code;
-		
-		try {
-			String first_name = json.getString("first_name");
-			if(first_name.compareTo("") == 0)
-				return error_code = 1;
-		}
-		catch(NullPointerException e) {
-			return error_code = 1;
-		}
-		
-		try {
-			String last_name = json.getString("last_name"); 
-			if(last_name.compareTo("") == 0)
-				return error_code = 2;
-		}
-		catch(NullPointerException e) {
-			return error_code = 2;
-		}
-		
-		try {
-			String phone_number = json.getString("phone"); 
-			if(phone_number.compareTo("") == 0 || DataPatternFormatter.validatePhoneNumber(phone_number) == -1)
-				return error_code = 3;
-		}
-		catch(NullPointerException e) {
-			return error_code = 3;
-		}
-		
-		try {
-			String picture = json.getString("picture");
-			if(picture.compareTo("") == 0)
-				return error_code = 4;
-		}
-		catch(NullPointerException e) {
-			return error_code = 4;
-		}
-		
-		try {
-			boolean is_active = json.getBoolean("is_active");
-		}
-		catch(NullPointerException e) {
-			return error_code = 5;
-		}
-
-		return error_code = 0;
-
-	}*/
+	}
 	
-	/*@Path("/accounts/{aid}")
+	@Path("/accounts/{aid}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response viewAccount(@PathParam("aid") String id) {
 		
-		JSONObject output = "";
+		String output = "";
 		Account a = abi.getAccount(Integer.valueOf(id));
+		
 		if(a == null) {
-			output = validationErrorResponse("Account not found", "/accounts/" + id + "/status", 404);
+			output = validationErrorResponse("Account not found", "/accounts/" + id + "/status", 404).toString();
 			return Response.status(Response.Status.NOT_FOUND).entity(output).build();
 		}
 		else {
-			output = jsonToString(a.toJson());
+			output = new JSONObject(a).toString();
 			return Response.status(Response.Status.OK).entity(output).build();
 		}
-	}*/
+	}
 	
 	/*@Path("/accounts")
 	@GET
@@ -279,5 +198,68 @@ public class REST_Controller {
 		}
 		return Response.status(Response.Status.OK).entity(output).build();
 	}*/
+	
+	//Error response generator for incorrect client input data.
+	private JSONObject validationErrorResponse(String detail, String instance, int status) {
+		JSONObject obj = new JSONObject();
+		obj.put("type", "http://cs.iit.edu/~virgil/cs445/project/api/problems/data-validation");
+		obj.put("title", "Your request data didn't pass validation");
+		obj.put("detail", detail);
+		obj.put("status", status);
+		obj.put("instance", instance);
+		return obj;
+	}
+	
+	//Checks the incoming json to see if is valid for an account.
+	public int validAccountJson(JSONObject json) {
+	
+		@SuppressWarnings("unused")
+		int error_code;
+		
+		try {
+			String first_name = json.getString("first_name");
+			if(first_name.compareTo("") == 0)
+				return error_code = 1;
+		}
+		catch(NullPointerException e) {
+			return error_code = 1;
+		}
+		
+		try {
+			String last_name = json.getString("last_name"); 
+			if(last_name.compareTo("") == 0)
+				return error_code = 2;
+		}
+		catch(NullPointerException e) {
+			return error_code = 2;
+		}
+		
+		try {
+			String phone_number = json.getString("phone"); 
+			if(phone_number.compareTo("") == 0 || DataPatternFormatter.validatePhoneNumber(phone_number) == -1)
+				return error_code = 3;
+		}
+		catch(NullPointerException e) {
+			return error_code = 3;
+		}
+		
+		try {
+			String picture = json.getString("picture");
+			if(picture.compareTo("") == 0)
+				return error_code = 4;
+		}
+		catch(NullPointerException e) {
+			return error_code = 4;
+		}
+		
+		try {
+			boolean is_active = json.getBoolean("is_active");
+		}
+		catch(NullPointerException e) {
+			return error_code = 5;
+		}
+	
+		return error_code = 0;
+	}
 	
 }

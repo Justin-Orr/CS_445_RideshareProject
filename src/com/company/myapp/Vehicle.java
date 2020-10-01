@@ -1,23 +1,35 @@
 package com.company.myapp;
 
+import org.json.JSONObject;
+
 public class Vehicle {
 	
-private String make, model, color, plate_number, plate_state;
+private String make, model, color, plateNumber, plateState;
 	
 	public Vehicle() {
 		make = "N/A"; 
 		model = "N/A";
 		color = "N/A"; 
-		plate_number = "N/A";
-		plate_state = "N/A";
+		plateNumber = "N/A";
+		plateState = "N/A";
 	}
 	
 	public Vehicle (String make, String model, String color, String plate_number, String plate_state) {
-		this.setMake(make);
-		this.setModel(model);
-		this.setColor(color);
-		this.setPlate_number(plate_number);
-		this.setPlate_state(plate_state);
+		this.make = make;
+		this.model = model;
+		this.color = color;
+		this.plateNumber = plate_number;
+		this.plateState = plate_state;
+	}
+	
+	public static Vehicle jsonToVehicle(JSONObject json) {
+		Vehicle v = new Vehicle();
+		v.setColor(json.getString("color"));
+		v.setMake(json.getString("make"));
+		v.setModel(json.getString("model"));
+		v.setPlateNumber(json.getString("plateNumber"));
+		v.setPlateState(json.getString("plateState"));
+		return v;
 	}
 
 	public String getMake() {
@@ -44,20 +56,20 @@ private String make, model, color, plate_number, plate_state;
 		this.color = color;
 	}
 
-	public String getPlate_number() {
-		return plate_number;
+	public String getPlateNumber() {
+		return plateNumber;
 	}
 
-	public void setPlate_number(String plate_number) {
-		this.plate_number = plate_number;
+	public void setPlateNumber(String plateNumber) {
+		this.plateNumber = plateNumber;
 	}
 
-	public String getPlate_state() {
-		return plate_state;
+	public String getPlateState() {
+		return plateState;
 	}
 
-	public void setPlate_state(String plate_state) {
-		this.plate_state = plate_state;
+	public void setPlateState(String plateState) {
+		this.plateState = plateState;
 	}
 
 }
