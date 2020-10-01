@@ -30,7 +30,6 @@ public class Account {
 		this.picture = picture;
 		this.vehicle = new Vehicle();
 		this.dateCreated = TimeStamp.stamp();
-		//this.dateCreated = "DD-MMM-YYYY, HH:MM";
 	}
 	
 	public static Account jsonToAccount(JSONObject json) {

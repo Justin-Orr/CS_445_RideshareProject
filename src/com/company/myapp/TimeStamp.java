@@ -1,14 +1,15 @@
 package com.company.myapp;
 
-import java.time.format.DateTimeFormatter;
-import java.time.LocalDateTime;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class TimeStamp {
 	
-	private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("DD-MMM-YYYY, HH:MM");
+	private static SimpleDateFormat formatter = new SimpleDateFormat("dd-LLL-yyyy hh:mm:ss a");
 	
 	public static String stamp() {
-		return dtf.format(LocalDateTime.now());
+		Date date = new Date(System.currentTimeMillis());
+		return formatter.format(date);
 	}
 	
 }
