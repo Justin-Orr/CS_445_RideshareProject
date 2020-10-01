@@ -5,11 +5,11 @@ public class Vehicle {
 private String make, model, color, plate_number, plate_state;
 	
 	public Vehicle() {
-		String make = "N/A"; 
-		String model = "N/A";
-		String color = "N/A"; 
-		String plate_number = "N/A";
-		String plate_state = "N/A";
+		make = "N/A"; 
+		model = "N/A";
+		color = "N/A"; 
+		plate_number = "N/A";
+		plate_state = "N/A";
 	}
 	
 	public Vehicle (String make, String model, String color, String plate_number, String plate_state) {
