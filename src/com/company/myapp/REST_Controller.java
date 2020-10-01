@@ -197,14 +197,10 @@ public class REST_Controller {
 	
 	/*@Path("/accounts/{aid}")
 	@GET
-	@Produces("text/plain")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response viewAccount(@PathParam("aid") String id) {
-		System.out.println(repo);
-		System.out.println(repo.size());
-		Account b = repo.get(1);
-		System.out.println(b);
 		
-		String output = "";
+		JSONObject output = "";
 		Account a = abi.getAccount(Integer.valueOf(id));
 		if(a == null) {
 			output = validationErrorResponse("Account not found", "/accounts/" + id + "/status", 404);
@@ -214,9 +210,9 @@ public class REST_Controller {
 			output = jsonToString(a.toJson());
 			return Response.status(Response.Status.OK).entity(output).build();
 		}
-	}
+	}*/
 	
-	@Path("/accounts")
+	/*@Path("/accounts")
 	@GET
 	@Produces("text/plain")
 	public Response viewAccount() {
@@ -237,9 +233,9 @@ public class REST_Controller {
 			output = jsonToString(a.toJson());
 			return Response.status(Response.Status.OK).entity(output).build();
 		}
-	}
+	}*/
 	
-	@Path("/accounts/{aid}/status")
+	/*@Path("/accounts/{aid}/status")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces("text/plain")
