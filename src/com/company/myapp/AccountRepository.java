@@ -35,6 +35,19 @@ public class AccountRepository implements AccountBoundaryInterface {
 		return obj.toString();
 	}
 	
+	public String searchAccounts(String key) {
+		JSONArray obj = new JSONArray();
+		String out = "";
+		ArrayList<Account> accounts = new ArrayList<Account>(repo.values());
+		for(Account a : accounts) {
+			if(key.compareToIgnoreCase(a.getFirstName()) == 0 || key.compareToIgnoreCase(a.getLastName()) == 0 || key.compareToIgnoreCase(a.getPhoneNumber()) == 0) {
+				out = a.toPrettyJson().toString();
+				obj.put(new JSONObject(out)); //Make a Json array of json objects with a summary of the accounts, not all data
+			}	
+		}
+		return obj.toString();
+	}
+	
 	public void updateAccount(Account a, JSONObject obj) {
 		a.setFirstName(obj.getString("first_name"));
 		a.setLastName(obj.getString("last_name"));

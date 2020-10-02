@@ -85,16 +85,19 @@ public class REST_Controller {
 	@Path("/accounts")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response viewAllAccounts() {
-		String output = abi.viewAllAccounts();
-		return Response.status(Response.Status.OK).entity(output).build();
-	}
-	
-	@Path("/accounts")
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response searchAccounts(@QueryParam("key") String key) {
-		String output = abi.searchAccounts(key);
+	public Response searchAccounts(@Context UriInfo uriInfo) {
+		//Grab the query parameters if present
+		MultivaluedMap<String, String> params = uriInfo.getQueryParameters(); 
+		String key = params.getFirst("key");
+		String output;
+		
+		if(key == null)
+			output = abi.viewAllAccounts();
+		else if(key.compareTo("") == 0)
+			output = abi.viewAllAccounts();
+		else
+			output = abi.searchAccounts(key);
+		
 		return Response.status(Response.Status.OK).entity(output).build();
 	}
 	
