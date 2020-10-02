@@ -3,7 +3,6 @@ package com.company.myapp;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 @Path("/sar")
@@ -123,27 +122,35 @@ public class REST_Controller {
 		JSONObject jsonObject = new JSONObject(json);
 		error_code = JSONValidator.validAccountJson(jsonObject);
 		
-		//Check for the appropriate is_active value
-		if(jsonObject.getBoolean("is_active") == true) 
-			error_code = JSONValidatorCode.INVALID_ACTIVE_VALUE;
-		
-		//Update account information
+		//Was it a valid account object?
 		if(error_code != JSONValidatorCode.VALID) {
 			error_message = JSONValidator.generateErrorMessage(error_code);
 			output = JSONValidator.validationErrorResponse(error_message, "/accounts/" + id, 400).toString();
 			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
 		}
 		else {
-			Account a = abi.getAccount(Integer.valueOf(id));
 			
-			if(a == null) {
-				output = JSONValidator.validationErrorResponse("Account not found", "/accounts/" + id + "/status", 404).toString();
-				return Response.status(Response.Status.NOT_FOUND).entity(output).build();
+			//Check for the appropriate is_active value
+			if(jsonObject.getBoolean("is_active") == true) 
+				error_code = JSONValidatorCode.INVALID_ACTIVE_VALUE;
+			
+			if(error_code == JSONValidatorCode.INVALID_ACTIVE_VALUE) {
+				error_message = JSONValidator.generateErrorMessage(error_code);
+				output = JSONValidator.validationErrorResponse(error_message, "/accounts/" + id, 400).toString();
+				return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
 			}
-			
-			abi.updateAccount(a, jsonObject);		 
-			
-			return Response.noContent().build();
+			else {
+				//Update account information
+				Account a = abi.getAccount(Integer.valueOf(id));
+				
+				if(a == null) {
+					output = JSONValidator.validationErrorResponse("Account not found", "/accounts/" + id + "/status", 404).toString();
+					return Response.status(Response.Status.NOT_FOUND).entity(output).build();
+				}
+				
+				abi.updateAccount(a, jsonObject);		 
+				return Response.noContent().build();
+			}
 		}
 		
 	}
@@ -168,26 +175,34 @@ public class REST_Controller {
 		JSONObject jsonObject = new JSONObject(json);
 		error_code = JSONValidator.validAccountJson(jsonObject);
 		
-		//Check for the appropriate is_active value, should be true.
-		if(jsonObject.getBoolean("is_active") == false) 
-			error_code = JSONValidatorCode.INVALID_ACTIVE_VALUE;
-		
-		//Update account information
+		//Activate account information
 		if(error_code != JSONValidatorCode.VALID) {
 			error_message = JSONValidator.generateErrorMessage(error_code);
 			output = JSONValidator.validationErrorResponse(error_message, "/accounts/" + id + "/status", 400).toString();
 			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
 		}
 		else {
-			Account a = abi.getAccount(Integer.valueOf(id));
+			//Check for the appropriate is_active value, should be true.
+			if(jsonObject.getBoolean("is_active") == false) 
+				error_code = JSONValidatorCode.INVALID_ACTIVE_VALUE;
 			
-			if(a == null) {
-				output = JSONValidator.validationErrorResponse("Account not found", "/accounts/" + id + "/status", 404).toString();
-				return Response.status(Response.Status.NOT_FOUND).entity(output).build();
+			if(error_code == JSONValidatorCode.INVALID_ACTIVE_VALUE) {
+				error_message = JSONValidator.generateErrorMessage(error_code);
+				output = JSONValidator.validationErrorResponse(error_message, "/accounts/" + id + "/status", 400).toString();
+				return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
 			}
+			else {
 			
-			abi.activateAccount(Integer.valueOf(id));
-			return Response.ok().build();
+				Account a = abi.getAccount(Integer.valueOf(id));
+				
+				if(a == null) {
+					output = JSONValidator.validationErrorResponse("Account not found", "/accounts/" + id + "/status", 404).toString();
+					return Response.status(Response.Status.NOT_FOUND).entity(output).build();
+				}
+				
+				abi.activateAccount(Integer.valueOf(id));
+				return Response.ok().build();
+			}
 		}
 		
 	}
