@@ -1,9 +1,5 @@
 package com.company.myapp;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-
 import org.json.JSONObject;
 
 public class Account {

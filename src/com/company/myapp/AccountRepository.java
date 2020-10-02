@@ -1,72 +1,46 @@
 package com.company.myapp;
 
-import java.io.IOException;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.File;
+import java.util.ArrayList;
+import java.util.Hashtable;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 public class AccountRepository implements AccountBoundaryInterface {
 	
-	String file_path;
+	//String file_path;
+	private static Hashtable<Integer, Account> repo = new Hashtable<Integer, Account>();
 	
 	public AccountRepository() {
-		///The File.separator is to accommodate forward and backslashes based on the operating system.
-		file_path = System.getProperty("catalina.base") + File.separator + "accounts.json";
+		//Default constructor
 	}
 	
 	public int creatAccount(String first_name, String last_name, String phone, String picture) {
 		Account a = new Account(first_name, last_name, phone, picture);
-		writeAccountToFile(a);
+		repo.put(a.getAid(), a);
 		return a.getAid();
 	}
 	
-	private int writeAccountToFile(Account a) {
-		JSONObject ja = new JSONObject(a);
-		
-		try {
-			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file_path, true));
-			bos.write(ja.toString().getBytes());
-			bos.flush();
-			bos.close();
-			return 0;
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-			return -1;
-		}
+	public Account getAccount(int aid) {
+		return repo.get(aid);
 	}
 	
-	public Account getAccount(int aid) {
-		
-		Account a = null;
-		
-		try {
-			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file_path));
-			JSONTokener tokenizer = new JSONTokener(bis);
-			JSONObject ja = new JSONObject(); 
-			while(tokenizer.more()) {
-				ja = (JSONObject) tokenizer.nextValue();
-				if(ja.getInt("aid") == aid) {
-					a = Account.jsonToAccount(ja);
-					break;
-				}
-			}
+	public String viewAllAccounts() {
+		JSONArray obj = new JSONArray();
+		ArrayList<Account> accounts = new ArrayList<Account>(repo.values());
+		for(Account a : accounts) {
+			String out = a.toPrettyJson().toString();
+			obj.put(new JSONObject(out)); //Make a Json array of json objects with a summary of the accounts, not all data
 		}
-		catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		
-		return a;
+		return obj.toString();
 	}
 	
 	public void updateAccount(Account a, JSONObject obj) {
-		
+		a.setFirstName(obj.getString("first_name"));
+		a.setLastName(obj.getString("last_name"));
+		a.setPhoneNumber(obj.getString("phone"));
+		a.setPicture(obj.getString("picture"));
+		repo.replace(a.getAid(), a);
 	}
 	
 	public int activateAccount(int aid) {
@@ -76,7 +50,6 @@ public class AccountRepository implements AccountBoundaryInterface {
 		}
 		else {
 			a.setActive(true);
-			updateAccount(a);
 			return 0;
 		}
 	}

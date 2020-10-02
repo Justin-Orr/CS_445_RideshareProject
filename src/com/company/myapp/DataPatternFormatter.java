@@ -10,7 +10,7 @@ public class DataPatternFormatter {
 	private static final String TIME_REGEX = "^([0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$";
 	private static final String PLATE_STATE_REGEX = "^(?i:A[LKSZRAEP]|C[AOT]|D[EC]|F[LM]|G[AU]|HI|I[ADLN]|K[SY]|LA|M[ADEHINOPST]|N[CDEHJMVY]|O[HKR]|P[ARW]|RI|S[CD]|T[NX]|UT|V[AIT]|W[AIVY])$";
 	private static final String FIRST_NAME_REGEX = "[A-Z][a-z]*";
-	private static final String LAST_NAME_REGEX = "[A-Z]+([ '-][a-zA-Z]+)**";
+	private static final String LAST_NAME_REGEX = "[A-Z][a-z]*";
 	
 	private static int validateData(String data, final String regex) {
 		Pattern p = Pattern.compile(regex);

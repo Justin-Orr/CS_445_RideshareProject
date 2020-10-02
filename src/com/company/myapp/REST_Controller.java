@@ -6,17 +6,6 @@ import javax.ws.rs.core.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
-
-import javax.json.*;
-import javax.json.stream.JsonGenerator;
-
 @Path("/sar")
 public class REST_Controller {
 	
@@ -35,11 +24,18 @@ public class REST_Controller {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createAccount(@Context UriInfo uriInfo, String json) {
+		String output;
+		int error_code = validJson(json);
+		
+		//Check if the input was a proper json at all
+		if(error_code == -1) {
+			output = validationErrorResponse("JSON syntax error", "/accounts", 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
 		
 		JSONObject jsonObject = new JSONObject(json);
 		
-		int error_code = validAccountJson(jsonObject);
-		String output;
+		error_code = validAccountJson(jsonObject);
 		
 		if(error_code == 0) {
 			String first_name = jsonObject.getString("first_name"); 
@@ -86,6 +82,22 @@ public class REST_Controller {
 	
 	}
 	
+	@Path("/accounts")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response viewAllAccounts() {
+		String output = abi.viewAllAccounts();
+		return Response.status(Response.Status.OK).entity(output).build();
+	}
+	
+	@Path("/accounts")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response searchAccounts(@QueryParam("key") String key) {
+		String output = abi.searchAccounts(key);
+		return Response.status(Response.Status.OK).entity(output).build();
+	}
+	
 	@Path("/accounts/{aid}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -110,10 +122,18 @@ public class REST_Controller {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateAccount(@PathParam("aid") String id, String json) {
 		String output;
+		int error_code = validJson(json);
+		
+		//Check if the input was a proper json at all
+		if(error_code == -1) {
+			output = validationErrorResponse("JSON syntax error", "/accounts/" + id, 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
+		
 		JSONObject jsonObject = new JSONObject(json);
 		
 		//Check if all values for an account are there and have a value.
-		int error_code = validAccountJson(jsonObject);
+		error_code = validAccountJson(jsonObject);
 		
 		if(jsonObject.getBoolean("is_active") == true) //Call activate account to make the account active
 			error_code = 5;
@@ -158,15 +178,23 @@ public class REST_Controller {
 	}
 	
 	@Path("/accounts/{aid}/status")
-	@POST
+	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response activateAccount(@PathParam("aid") String id, String json) {
 		String output;
+		int error_code = validJson(json);
+		
+		//Check if the input was a proper json at all
+		if(error_code == -1) {
+			output = validationErrorResponse("JSON syntax error", "/accounts/" + id + "/status", 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
+		
 		JSONObject jsonObject = new JSONObject(json);
 		
 		//Check if all values for an account are there and have a value.
-		int error_code = validAccountJson(jsonObject);
+		error_code = validAccountJson(jsonObject);
 		
 		if(jsonObject.getBoolean("is_active") == false) //Should be true
 			error_code = 5;
@@ -222,6 +250,19 @@ public class REST_Controller {
 	}
 	
 	
+	//Check if the incoming string is json at all
+	public int validJson(String json) {
+		try {
+			@SuppressWarnings("unused")
+			JSONObject obj = new JSONObject(json);
+			return 0;
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+			return -1;
+		}
+	}
+	
 	//Checks the incoming json to see if is valid for an account.
 	public int validAccountJson(JSONObject json) {
 	
@@ -264,7 +305,8 @@ public class REST_Controller {
 			return error_code = 4;
 		}
 		
-		try {
+		try {	
+			@SuppressWarnings("unused")
 			boolean is_active = json.getBoolean("is_active");
 		}
 		catch(NullPointerException | JSONException e) {
