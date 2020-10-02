@@ -241,6 +241,72 @@ public class REST_Controller {
 		
 	}
 	
+	@Path("/rides")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response createRide(@Context UriInfo uriInfo, String json) {
+		String output;
+		
+		//Check if the input was a proper json at all
+		int error_code = validJson(json);
+		
+		if(error_code == -1) {
+			output = validationErrorResponse("JSON syntax error", "/rides", 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
+		
+		//Create new json object out of input
+		JSONObject jsonObject = new JSONObject(json);
+		
+		//Check if json is a valid account json.
+		error_code = validRideJson(jsonObject);
+		
+		/*if(error_code == 0) {
+			String first_name = jsonObject.getString("first_name"); 
+			String last_name = jsonObject.getString("last_name"); 
+			String phone_number = jsonObject.getString("phone"); 
+			String picture = jsonObject.getString("picture");
+			int id = abi.creatAccount(first_name, last_name, phone_number, picture);
+			
+			//Create response json
+			JSONObject obj = new JSONObject();
+			obj.put("aid", id);
+			output = obj.toString();
+			 
+			// Build the URI for the "Location:" header
+			UriBuilder builder = uriInfo.getAbsolutePathBuilder();
+			builder.path(Integer.toString(id));
+			
+			return Response.status(Response.Status.CREATED).entity(output).build();
+		}
+		else if(error_code == 1) {
+			output = validationErrorResponse("Invalid first name", "/rides", 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
+		else if(error_code == 2) {
+			output = validationErrorResponse("Invalid last name", "/rides", 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
+		else if(error_code == 3) {
+			output = validationErrorResponse("Invalid phone number", "/rides", 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
+		else if(error_code == 4) {
+			output = validationErrorResponse("Invalid picture URL/filetype", "/rides", 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
+		else if(error_code == 5) {
+			output = validationErrorResponse("Invalid value for is_active", "/rides", 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
+		else {
+			output = validationErrorResponse("Unhandled_error_code", "/rides", 500).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}*/
+	
+	}
+	
 	//Error response generator for incorrect client input data.
 	private JSONObject validationErrorResponse(String detail, String instance, int status) {
 		JSONObject obj = new JSONObject();
@@ -270,7 +336,7 @@ public class REST_Controller {
 	public int validAccountJson(JSONObject json) {
 	
 		@SuppressWarnings("unused")
-		int error_code;
+		int error_code = 0;
 		
 		try {
 			String first_name = json.getString("first_name");
@@ -316,7 +382,211 @@ public class REST_Controller {
 			return error_code = 5;
 		}
 	
-		return error_code = 0;
+		return error_code;
+	}
+	
+	@SuppressWarnings("unused")
+	//Checks the incoming json to see if is valid for an account.
+	public int validRideJson(JSONObject json) {
+	
+		int error_code = 0;
+		
+		try {
+			int aid = json.getInt("aid");
+		}
+		catch(NullPointerException | JSONException e ) {
+			return error_code = 1;
+		}
+		
+		try {
+			int max_passengers = json.getInt("max_passengers"); 
+		}
+		catch(NullPointerException | JSONException e) {
+			return error_code = 2;
+		}
+		
+		try {
+			double ammount_per_passenger = json.getDouble("ammount_per_passenger"); 
+		}
+		catch(NullPointerException | JSONException e) {
+			return error_code = 3;
+		}
+		
+		try {
+			String conditions = json.getString("conditions");
+		}
+		catch(NullPointerException | JSONException e) {
+			return error_code = 4;
+		}
+		
+		JSONObject locationObject;
+		try {
+			locationObject = json.getJSONObject("location_info");
+		}
+		catch(NullPointerException | JSONException e) {
+			return error_code = 5;
+		}
+		
+		error_code = validLocationJson(locationObject);
+		
+		if(error_code != 0)
+			return error_code;
+		
+		JSONObject dateTimeObject;
+		try {
+			dateTimeObject = json.getJSONObject("date_time");
+		}
+		catch(NullPointerException | JSONException e) {
+			return error_code = 10;
+		}
+		
+		error_code = validDateTimeJson(dateTimeObject);
+		
+		if(error_code != 0)
+			return error_code;
+		
+		JSONObject vehicleObject;
+		try {
+			vehicleObject = json.getJSONObject("car_info");
+		}
+		catch(NullPointerException | JSONException e) {
+			return error_code = 13;
+		}
+		
+		error_code = validVehicleJson(vehicleObject);
+	
+		return error_code;
+	}
+	
+	@SuppressWarnings("unused")
+	//Checks the incoming json to see if is valid for an location.
+	public int validLocationJson(JSONObject json) {
+		
+		int error_code = 0;
+		
+		try {
+			String from_city = json.getString("from_city");
+			if(from_city.compareTo("") == 0 || DataPatternFormatter.validateCity(from_city) == -1)
+				return error_code = 6;
+		}
+		catch(NullPointerException | JSONException e ) {
+			return error_code = 6;
+		}
+		
+		try {
+			//Optional Argument but if there is a value check the format
+			String from_zip = json.getString("from_zip"); 
+			if(from_zip.compareTo("") != 0) { 
+				if(DataPatternFormatter.validateZipCode(from_zip) == -1)
+					return error_code = 7;
+			}
+		}
+		catch(NullPointerException | JSONException e) {
+			return error_code = 7;
+		}
+		
+		try {
+			String to_city = json.getString("to_city"); 
+			if(to_city.compareTo("") == 0 || DataPatternFormatter.validateCity(to_city) == -1)
+				return error_code = 8;
+		}
+		catch(NullPointerException | JSONException e) {
+			return error_code = 8;
+		}
+		
+		try {
+			//Optional Argument but if there is a value check the format
+			String to_zip = json.getString("to_zip"); 
+			if(to_zip.compareTo("") != 0) { 
+				if(DataPatternFormatter.validateZipCode(to_zip) == -1)
+					return error_code = 9;
+			}
+		}
+		catch(NullPointerException | JSONException e) {
+			return error_code = 9;
+		}
+	
+		return error_code;
+	}
+		
+	//Checks the incoming json to see if is valid for a date/time.
+	public int validDateTimeJson(JSONObject json) {
+	
+		@SuppressWarnings("unused")
+		int error_code = 0;
+		
+		try {
+			String date = json.getString("date");
+			if(date.compareTo("") == 0 || DataPatternFormatter.validateDate(date) == -1)
+				return error_code = 11;
+		}
+		catch(NullPointerException | JSONException e ) {
+			return error_code = 11;
+		}
+		
+		try {
+			String time = json.getString("time"); 
+			if(time.compareTo("") == 0 || DataPatternFormatter.validateTime(time) == -1)
+				return error_code = 12;
+		}
+		catch(NullPointerException | JSONException e) {
+			return error_code = 12;
+		}
+	
+		return error_code;
+	}
+	
+	//Checks the incoming json to see if is valid for a vehicle.
+	public int validVehicleJson(JSONObject json) {
+	
+		int error_code = 0;
+		
+		try {
+			String make = json.getString("make");
+			if(make.compareTo("") == 0)
+				return error_code = 14;
+		}
+		catch(NullPointerException | JSONException e ) {
+			return error_code = 14;
+		}
+		
+		try {
+			String model = json.getString("model"); 
+			if(model.compareTo("") == 0)
+				return error_code = 15;
+		}
+		catch(NullPointerException | JSONException e) {
+			return error_code = 15;
+		}
+		
+		try {
+			String color = json.getString("color"); 
+			if(color.compareTo("") == 0)
+				return error_code = 16;
+		}
+		catch(NullPointerException | JSONException e) {
+			return error_code = 16;
+		}
+		
+		try {
+			String plate_state = json.getString("plate_state");
+			if(plate_state.compareTo("") == 0 || DataPatternFormatter.validatePlateState(plate_state) == -1)
+				return error_code = 17;
+		}
+		catch(NullPointerException | JSONException e) {
+			return error_code = 17;
+		}
+		
+		try {	
+			String plate_serial = json.getString("plate_serial");
+			if(plate_serial.compareTo("") == 0)
+					return error_code = 18;
+		}
+		catch(NullPointerException | JSONException e) {
+			return error_code = 18;
+		}
+	
+		return error_code;
 	}
 	
 }

@@ -11,6 +11,8 @@ public class DataPatternFormatter {
 	private static final String PLATE_STATE_REGEX = "^(?i:A[LKSZRAEP]|C[AOT]|D[EC]|F[LM]|G[AU]|HI|I[ADLN]|K[SY]|LA|M[ADEHINOPST]|N[CDEHJMVY]|O[HKR]|P[ARW]|RI|S[CD]|T[NX]|UT|V[AIT]|W[AIVY])$";
 	private static final String FIRST_NAME_REGEX = "[A-Z][a-z]*";
 	private static final String LAST_NAME_REGEX = "[A-Z][a-z]*";
+	private static final String CITY_REGEX = "^[a-zA-Z]+(?:[\\s-][a-zA-Z]+)*$";
+	private static final String ZIP_CODE_REGEX = "^\\d{5}$";
 	
 	private static int validateData(String data, final String regex) {
 		Pattern p = Pattern.compile(regex);
@@ -45,5 +47,13 @@ public class DataPatternFormatter {
 	public static int validateLastName(String name) {
 		return validateData(name, LAST_NAME_REGEX); 
 	}
+	
+	public static int validateCity(String name) {
+		return validateData(name, CITY_REGEX); 
+	}
 
+	public static int validateZipCode(String zip) {
+		return validateData(zip, ZIP_CODE_REGEX); 
+	}
+	
 }
