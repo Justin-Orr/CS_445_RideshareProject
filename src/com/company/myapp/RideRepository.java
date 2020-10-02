@@ -6,21 +6,21 @@ import java.util.Hashtable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class AccountRepository implements AccountRepositoryInterface {
+public class RideRepository implements RideRepositoryInterface {
 	
-	private static Hashtable<Integer, Account> repo = new Hashtable<Integer, Account>();
-	
-	public AccountRepository() {
+	private static Hashtable<Integer, Ride> repo = new Hashtable<Integer, Ride>();
+		
+	public RideRepository() {
 		//Default constructor
 	}
 	
-	public int creatAccount(String first_name, String last_name, String phone, String picture) {
-		Account a = new Account(first_name, last_name, phone, picture);
-		repo.put(a.getAid(), a);
-		return a.getAid();
+	public int creatAccount(int driverID, int maxNumberOfPassengers, double ammountPerPerson, Location location, DateTime dateTime, Vehicle vehicle, String conditions) {
+		Ride r = new Ride(driverID, maxNumberOfPassengers, ammountPerPerson, location, dateTime, vehicle, conditions);
+		repo.put(r.getRid(), r);
+		return r.getRid();
 	}
 	
-	public Account getAccount(int aid) {
+	/*public Account getAccount(int aid) {
 		return repo.get(aid);
 	}
 	
@@ -53,17 +53,6 @@ public class AccountRepository implements AccountRepositoryInterface {
 		a.setPhoneNumber(obj.getString("phone"));
 		a.setPicture(obj.getString("picture"));
 		repo.replace(a.getAid(), a);
-	}
-	
-	public int activateAccount(int aid) {
-		Account a = getAccount(aid);
-		if(a == null) {
-			return -1;
-		}
-		else {
-			a.setActive(true);
-			return 0;
-		}
-	}
+	}*/
 	
 }
