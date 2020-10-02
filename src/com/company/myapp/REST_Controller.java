@@ -25,19 +25,27 @@ public class REST_Controller {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createAccount(@Context UriInfo uriInfo, String json) {
 		String output;
-		int error_code = validJson(json);
+		String error_message;
+		JSONValidatorCode error_code = JSONValidator.validJson(json);
 		
 		//Check if the input was a proper json at all
-		if(error_code == -1) {
-			output = validationErrorResponse("JSON syntax error", "/accounts", 400).toString();
+		if(error_code == JSONValidatorCode.INVALID_JSON) {
+			error_message = JSONValidator.generateErrorMessage(error_code);
+			output = JSONValidator.validationErrorResponse(error_message, "/accounts", 400).toString();
 			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
 		}
 		
+		//Check if the json has an account format
 		JSONObject jsonObject = new JSONObject(json);
+		error_code = JSONValidator.validAccountJson(jsonObject);
 		
-		error_code = validAccountJson(jsonObject);
-		
-		if(error_code == 0) {
+		if(error_code != JSONValidatorCode.VALID) {
+			error_message = JSONValidator.generateErrorMessage(error_code);
+			output = JSONValidator.validationErrorResponse(error_message, "/accounts", 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
+		else {
+			//Create an account
 			String first_name = jsonObject.getString("first_name"); 
 			String last_name = jsonObject.getString("last_name"); 
 			String phone_number = jsonObject.getString("phone"); 
@@ -54,30 +62,6 @@ public class REST_Controller {
 			builder.path(Integer.toString(id));
 			
 			return Response.status(Response.Status.CREATED).entity(output).build();
-		}
-		else if(error_code == 1) {
-			output = validationErrorResponse("Invalid first name", "/accounts", 400).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
-		else if(error_code == 2) {
-			output = validationErrorResponse("Invalid last name", "/accounts", 400).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
-		else if(error_code == 3) {
-			output = validationErrorResponse("Invalid phone number", "/accounts", 400).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
-		else if(error_code == 4) {
-			output = validationErrorResponse("Invalid picture URL/filetype", "/accounts", 400).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
-		else if(error_code == 5) {
-			output = validationErrorResponse("Invalid value for is_active", "/accounts", 400).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
-		else {
-			output = validationErrorResponse("Unhandled_error_code", "/accounts", 500).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
 		}
 	
 	}
@@ -110,7 +94,7 @@ public class REST_Controller {
 		Account a = abi.getAccount(Integer.valueOf(id));
 		
 		if(a == null) {
-			output = validationErrorResponse("Account not found", "/accounts/" + id, 404).toString();
+			output = JSONValidator.validationErrorResponse("Account not found", "/accounts/" + id, 404).toString();
 			return Response.status(Response.Status.NOT_FOUND).entity(output).build();
 		}
 		else {
@@ -125,57 +109,41 @@ public class REST_Controller {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateAccount(@PathParam("aid") String id, String json) {
 		String output;
-		int error_code = validJson(json);
+		String error_message;
+		JSONValidatorCode error_code = JSONValidator.validJson(json);
 		
 		//Check if the input was a proper json at all
-		if(error_code == -1) {
-			output = validationErrorResponse("JSON syntax error", "/accounts/" + id, 400).toString();
+		if(error_code == JSONValidatorCode.INVALID_JSON) {
+			error_message = JSONValidator.generateErrorMessage(error_code);
+			output = JSONValidator.validationErrorResponse(error_message, "/accounts/" + id, 400).toString();
 			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
 		}
 		
-		JSONObject jsonObject = new JSONObject(json);
-		
 		//Check if all values for an account are there and have a value.
-		error_code = validAccountJson(jsonObject);
+		JSONObject jsonObject = new JSONObject(json);
+		error_code = JSONValidator.validAccountJson(jsonObject);
 		
-		if(jsonObject.getBoolean("is_active") == true) //Call activate account to make the account active
-			error_code = 5;
+		//Check for the appropriate is_active value
+		if(jsonObject.getBoolean("is_active") == true) 
+			error_code = JSONValidatorCode.INVALID_ACTIVE_VALUE;
 		
-		if(error_code == 0) {
+		//Update account information
+		if(error_code != JSONValidatorCode.VALID) {
+			error_message = JSONValidator.generateErrorMessage(error_code);
+			output = JSONValidator.validationErrorResponse(error_message, "/accounts/" + id, 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
+		else {
 			Account a = abi.getAccount(Integer.valueOf(id));
 			
 			if(a == null) {
-				output = validationErrorResponse("Account not found", "/accounts/" + id + "/status", 404).toString();
+				output = JSONValidator.validationErrorResponse("Account not found", "/accounts/" + id + "/status", 404).toString();
 				return Response.status(Response.Status.NOT_FOUND).entity(output).build();
 			}
 			
 			abi.updateAccount(a, jsonObject);		 
 			
 			return Response.noContent().build();
-		}
-		else if(error_code == 1) {
-			output = validationErrorResponse("Invalid first name", "/accounts", 400).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
-		else if(error_code == 2) {
-			output = validationErrorResponse("Invalid last name", "/accounts", 400).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
-		else if(error_code == 3) {
-			output = validationErrorResponse("Invalid phone number", "/accounts", 400).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
-		else if(error_code == 4) {
-			output = validationErrorResponse("Invalid picture URL/filetype", "/accounts", 400).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
-		else if(error_code == 5) {
-			output = validationErrorResponse("Invalid value for is_active", "/accounts", 400).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
-		else {
-			output = validationErrorResponse("Unhandled_error_code", "/accounts", 500).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
 		}
 		
 	}
@@ -186,62 +154,45 @@ public class REST_Controller {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response activateAccount(@PathParam("aid") String id, String json) {
 		String output;
-		int error_code = validJson(json);
+		String error_message;
+		JSONValidatorCode error_code = JSONValidator.validJson(json);
 		
 		//Check if the input was a proper json at all
-		if(error_code == -1) {
-			output = validationErrorResponse("JSON syntax error", "/accounts/" + id + "/status", 400).toString();
+		if(error_code == JSONValidatorCode.INVALID_JSON) {
+			error_message = JSONValidator.generateErrorMessage(error_code);
+			output = JSONValidator.validationErrorResponse(error_message, "/accounts/" + id + "/status", 400).toString();
 			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
 		}
-		
-		JSONObject jsonObject = new JSONObject(json);
 		
 		//Check if all values for an account are there and have a value.
-		error_code = validAccountJson(jsonObject);
+		JSONObject jsonObject = new JSONObject(json);
+		error_code = JSONValidator.validAccountJson(jsonObject);
 		
-		if(jsonObject.getBoolean("is_active") == false) //Should be true
-			error_code = 5;
+		//Check for the appropriate is_active value, should be true.
+		if(jsonObject.getBoolean("is_active") == false) 
+			error_code = JSONValidatorCode.INVALID_ACTIVE_VALUE;
 		
-		if(error_code == 0) {
-			Account a = abi.getAccount(Integer.valueOf(id));
-			
-			if(a == null) {
-				output = validationErrorResponse("Account not found", "/accounts/" + id + "/status", 404).toString();
-				return Response.status(Response.Status.NOT_FOUND).entity(output).build();
-			}
-			
-			abi.activateAccount(Integer.valueOf(id));		 
-			
-			return Response.ok().build();
-		}
-		else if(error_code == 1) {
-			output = validationErrorResponse("Invalid first name", "/accounts", 400).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
-		else if(error_code == 2) {
-			output = validationErrorResponse("Invalid last name", "/accounts", 400).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
-		else if(error_code == 3) {
-			output = validationErrorResponse("Invalid phone number", "/accounts", 400).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
-		else if(error_code == 4) {
-			output = validationErrorResponse("Invalid picture URL/filetype", "/accounts", 400).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
-		else if(error_code == 5) {
-			output = validationErrorResponse("Invalid value for is_active", "/accounts", 400).toString();
+		//Update account information
+		if(error_code != JSONValidatorCode.VALID) {
+			error_message = JSONValidator.generateErrorMessage(error_code);
+			output = JSONValidator.validationErrorResponse(error_message, "/accounts/" + id + "/status", 400).toString();
 			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
 		}
 		else {
-			output = validationErrorResponse("Unhandled_error_code", "/accounts", 500).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+			Account a = abi.getAccount(Integer.valueOf(id));
+			
+			if(a == null) {
+				output = JSONValidator.validationErrorResponse("Account not found", "/accounts/" + id + "/status", 404).toString();
+				return Response.status(Response.Status.NOT_FOUND).entity(output).build();
+			}
+			
+			abi.activateAccount(Integer.valueOf(id));
+			return Response.ok().build();
 		}
 		
 	}
 	
-	@Path("/rides")
+	/*@Path("/rides")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -262,7 +213,7 @@ public class REST_Controller {
 		//Check if json is a valid account json.
 		error_code = validRideJson(jsonObject);
 		
-		/*if(error_code == 0) {
+		if(error_code == 0) {
 			String first_name = jsonObject.getString("first_name"); 
 			String last_name = jsonObject.getString("last_name"); 
 			String phone_number = jsonObject.getString("phone"); 
@@ -303,8 +254,8 @@ public class REST_Controller {
 		else {
 			output = validationErrorResponse("Unhandled_error_code", "/rides", 500).toString();
 			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}*/
+		}
 	
-	}	
+	}*/	
 	
 }

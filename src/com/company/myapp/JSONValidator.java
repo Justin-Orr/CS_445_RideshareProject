@@ -16,6 +16,7 @@ public class JSONValidator {
 		return obj;
 	}
 	
+	//Generate corresponding error messages based on the error code.
 	public static String generateErrorMessage(JSONValidatorCode code) {
 		switch(code) {
 			case INVALID_JSON: return "Invalid JSON Object";
@@ -60,7 +61,7 @@ public class JSONValidator {
 	//Checks the incoming json to see if it is valid for an account.
 	@SuppressWarnings("unused")
 	//Checks the incoming json to see if is valid for an account.
-	public JSONValidatorCode validAccountJson(JSONObject json) {
+	public static JSONValidatorCode validAccountJson(JSONObject json) {
 		
 		JSONValidatorCode error_code = JSONValidatorCode.VALID;
 		
@@ -113,7 +114,7 @@ public class JSONValidator {
 	//Checks the incoming json to see if it is valid for a ride.
 	@SuppressWarnings("unused")
 	//Checks the incoming json to see if is valid for an account.
-	public JSONValidatorCode validRideJson(JSONObject json) {
+	public static JSONValidatorCode validRideJson(JSONObject json) {
 	
 		JSONValidatorCode error_code = JSONValidatorCode.VALID;
 		
@@ -187,7 +188,7 @@ public class JSONValidator {
 	//Checks the incoming json to see if it is valid for a location.
 	@SuppressWarnings("unused")
 	//Checks the incoming json to see if is valid for an location.
-	public JSONValidatorCode validLocationJson(JSONObject json) {
+	public static JSONValidatorCode validLocationJson(JSONObject json) {
 		
 		JSONValidatorCode error_code = JSONValidatorCode.VALID;
 		
@@ -237,7 +238,7 @@ public class JSONValidator {
 	}
 		
 	//Checks the incoming json to see if it is valid for a date/time.
-	public JSONValidatorCode validDateTimeJson(JSONObject json) {
+	public static JSONValidatorCode validDateTimeJson(JSONObject json) {
 	
 		@SuppressWarnings("unused")
 		JSONValidatorCode error_code = JSONValidatorCode.VALID;
@@ -264,7 +265,7 @@ public class JSONValidator {
 	}
 	
 	//Checks the incoming json to see if it is valid for a vehicle.
-	public JSONValidatorCode validVehicleJson(JSONObject json) {
+	public static JSONValidatorCode validVehicleJson(JSONObject json) {
 	
 		JSONValidatorCode error_code = JSONValidatorCode.VALID;
 		
