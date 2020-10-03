@@ -23,6 +23,7 @@ public class JSONValidator {
 		switch(code) {
 			case INVALID_JSON: return "Invalid JSON Object";
 			case INVALID_NUMBER: return "Invalid Id";
+			case INVALID_STRING: return "Invalid string";
 			case INVALID_FIRST_NAME: return "Invalid first name";
 			case INVALID_LAST_NAME: return "Invalid last name";
 			case INVALID_PHONE_NUMBER: return "Invalid phone number";
@@ -334,6 +335,49 @@ public class JSONValidator {
 		catch(NullPointerException | JSONException e) {
 			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_PLATE_SERIAL;
+		}
+	
+		return error_code;
+	}
+	
+	@SuppressWarnings("unused")
+	//Checks the incoming json to see if it is valid for a rating.
+	public static JSONValidatorCode validRatingJson(JSONObject json) {
+	
+		JSONValidatorCode error_code = JSONValidatorCode.VALID;
+		
+		try {
+			int rid = json.getInt("rid");
+		}
+		catch(NullPointerException | JSONException e ) {
+			e.printStackTrace();
+			return error_code = JSONValidatorCode.INVALID_NUMBER;
+		}
+		
+		try {
+			int sent_by_id = json.getInt("sent_by_id");
+		}
+		catch(NullPointerException | JSONException e ) {
+			e.printStackTrace();
+			return error_code = JSONValidatorCode.INVALID_NUMBER;
+		}
+		
+		try {
+			int rating = json.getInt("rating");
+			if(rating > 5 || rating < 1)
+				return error_code = JSONValidatorCode.INVALID_NUMBER;
+		}
+		catch(NullPointerException | JSONException e ) {
+			e.printStackTrace();
+			return error_code = JSONValidatorCode.INVALID_NUMBER;
+		}
+		
+		try {
+			String comment = json.getString("comment");
+		}
+		catch(NullPointerException | JSONException e ) {
+			e.printStackTrace();
+			return error_code = JSONValidatorCode.INVALID_STRING;
 		}
 	
 		return error_code;

@@ -14,8 +14,9 @@ import com.company.myapp.utilities.*;
 @Path("/sar")
 public class REST_Controller {
 	
-	AccountRepositoryInterface ari = new AccountRepository();
-	RideRepositoryInterface rri = new RideRepository();
+	AccountRepositoryInterface account_repo = new AccountRepository();
+	RideRepositoryInterface ride_repo = new RideRepository();
+	RatingRepositoryInterface rate_repo = new RatingRepository();
 	
 	@GET
     @Produces("text/plain")
@@ -56,7 +57,7 @@ public class REST_Controller {
 			String last_name = jsonObject.getString("last_name"); 
 			String phone_number = jsonObject.getString("phone"); 
 			String picture = jsonObject.getString("picture");
-			int id = ari.createAccount(first_name, last_name, phone_number, picture);
+			int id = account_repo.createAccount(first_name, last_name, phone_number, picture);
 			
 			//Create response json
 			JSONObject obj = new JSONObject();
@@ -82,11 +83,11 @@ public class REST_Controller {
 		String output;
 		
 		if(key == null)
-			output = ari.viewAllAccounts();
+			output = account_repo.viewAllAccounts();
 		else if(key.compareTo("") == 0)
-			output = ari.viewAllAccounts();
+			output = account_repo.viewAllAccounts();
 		else
-			output = ari.searchAccounts(key);
+			output = account_repo.searchAccounts(key);
 		
 		return Response.status(Response.Status.OK).entity(output).build();
 	}
@@ -97,7 +98,7 @@ public class REST_Controller {
 	public Response viewAccount(@PathParam("aid") String id) {
 		
 		String output = "";
-		Account a = ari.getAccount(Integer.valueOf(id));
+		Account a = account_repo.getAccount(Integer.valueOf(id));
 		
 		if(a == null) {
 			output = JSONValidator.validationErrorResponse("Account not found", "/accounts/" + id, 404).toString();
@@ -148,14 +149,14 @@ public class REST_Controller {
 			}
 			else {
 				//Update account information
-				Account a = ari.getAccount(Integer.valueOf(id));
+				Account a = account_repo.getAccount(Integer.valueOf(id));
 				
 				if(a == null) {
 					output = JSONValidator.validationErrorResponse("Account not found", "/accounts/" + id + "/status", 404).toString();
 					return Response.status(Response.Status.NOT_FOUND).entity(output).build();
 				}
 				
-				ari.updateAccount(a, jsonObject);		 
+				account_repo.updateAccount(a, jsonObject);		 
 				return Response.noContent().build();
 			}
 		}
@@ -200,16 +201,83 @@ public class REST_Controller {
 			}
 			else {
 			
-				Account a = ari.getAccount(Integer.valueOf(id));
+				Account a = account_repo.getAccount(Integer.valueOf(id));
 				
 				if(a == null) {
 					output = JSONValidator.validationErrorResponse("Account not found", "/accounts/" + id + "/status", 404).toString();
 					return Response.status(Response.Status.NOT_FOUND).entity(output).build();
 				}
 				
-				ari.activateAccount(Integer.valueOf(id));
+				account_repo.activateAccount(Integer.valueOf(id));
 				return Response.ok().build();
 			}
+		}
+		
+	}
+	
+	@Path("/accounts/{aid}/ratings")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response rateAccount(@Context UriInfo uriInfo, String json) {
+		String output;
+		String error_message;
+		
+		
+		//Check if the input was a proper json at all
+		JSONValidatorCode error_code = JSONValidator.validJson(json);
+		if(error_code == JSONValidatorCode.INVALID_JSON) {
+			error_message = JSONValidator.generateErrorMessage(error_code);
+			output = JSONValidator.validationErrorResponse(error_message, uriInfo.getPath(), 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
+		
+		//Check if json is a valid rating json.
+		JSONObject jsonObject = new JSONObject(json);
+		error_code = JSONValidator.validRatingJson(jsonObject);
+		
+		if(error_code != JSONValidatorCode.VALID) {
+			error_message = JSONValidator.generateErrorMessage(error_code);
+			output = JSONValidator.validationErrorResponse(error_message, uriInfo.getPath(), 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
+		else {
+			int rid = jsonObject.getInt("rid");
+			int sent_by_id = jsonObject.getInt("sent_by_id");
+			int rating = jsonObject.getInt("rating");
+			String comment = jsonObject.getString("comment");
+			
+			//Check if ride exists
+			Ride r = ride_repo.getRide(rid);
+			if(r == null) {
+				output = JSONValidator.validationErrorResponse("Ride does not exist", "/rides", 404).toString();
+				return Response.status(Response.Status.NOT_FOUND).entity(output).build();
+			}
+			
+			//Check if accounts exist
+			Account a = account_repo.getAccount(sent_by_id);
+			Account b = account_repo.getAccount(r.getDriverID());
+			if(a == null || b == null) {
+				output = JSONValidator.validationErrorResponse("One of the accounts listed do not exist", "/rides", 404).toString();
+				return Response.status(Response.Status.NOT_FOUND).entity(output).build();
+			}
+			
+			//Check if sender was apart of the ride
+			FIX ME
+			
+			//Create rating
+			int id = rate_repo.rateAccount(rid, sent_by_id, rating, comment);
+			
+			//Create response json
+			JSONObject obj = new JSONObject();
+			obj.put("sid", id);
+			output = obj.toString();
+			 
+			// Build the URI for the "Location:" header
+			UriBuilder builder = uriInfo.getAbsolutePathBuilder();
+			builder.path(Integer.toString(id));
+			
+			return Response.status(Response.Status.CREATED).entity(output).build();
 		}
 		
 	}
@@ -241,8 +309,16 @@ public class REST_Controller {
 			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
 		}
 		else {
-			//Create ride object
+			//Check if account listed exists
 			int driverID = jsonObject.getInt("aid");
+			
+			Account a = account_repo.getAccount(driverID);
+			if(a == null) {
+				output = JSONValidator.validationErrorResponse("Account not found", "/rides", 404).toString();
+				return Response.status(Response.Status.NOT_FOUND).entity(output).build();
+			}
+			
+			//Create Ride
 			int maxNumberOfPassengers = jsonObject.getInt("max_passengers");
 			double ammountPerPerson = jsonObject.getDouble("amount_per_passenger");
 			String conditions = jsonObject.getString("conditions");
@@ -255,7 +331,7 @@ public class REST_Controller {
 			
 			JSONObject veh = jsonObject.getJSONObject("car_info");
 			Vehicle vehicle = new Vehicle(veh.getString("make"), veh.getString("model"), veh.getString("color"), veh.getString("plate_state"), veh.getString("plate_serial"));
-			int id = rri.createRide(driverID, maxNumberOfPassengers, ammountPerPerson, location, dateTime, vehicle, conditions);
+			int id = ride_repo.createRide(driverID, maxNumberOfPassengers, ammountPerPerson, location, dateTime, vehicle, conditions);
 			
 			//Create response json
 			JSONObject obj = new JSONObject();
@@ -271,7 +347,7 @@ public class REST_Controller {
 	
 	}	
 	
-	@Path("/rides/{rid}")
+	/*@Path("/rides/{rid}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response viewRide(@PathParam("rid") String id) {
@@ -292,6 +368,6 @@ public class REST_Controller {
 		}
 		
 		//Grab associated account ratings for details
-	}
+	}*/
 	
 }
