@@ -30,12 +30,12 @@ public class RideRepository implements RideRepositoryInterface {
 		return repo.get(rid);
 	}
 	
-	/*public String viewAllAccounts() {
+	public String viewAllRides() {
 		JSONArray obj = new JSONArray();
-		ArrayList<Account> accounts = new ArrayList<Account>(repo.values());
-		for(Account a : accounts) {
-			String out = a.toPrettyJson().toString();
-			obj.put(new JSONObject(out)); //Make a Json array of json objects with a summary of the accounts, not all data
+		ArrayList<Ride> rides = new ArrayList<Ride>(repo.values());
+		for(Ride r : rides) {
+			String out = r.toJson().toString();
+			obj.put(new JSONObject(out));
 		}
 		return obj.toString();
 	}
@@ -53,7 +53,7 @@ public class RideRepository implements RideRepositoryInterface {
 		return obj.toString();
 	}
 	
-	public void updateAccount(Account a, JSONObject obj) {
+	/*public void updateAccount(Account a, JSONObject obj) {
 		a.setFirstName(obj.getString("first_name"));
 		a.setLastName(obj.getString("last_name"));
 		a.setPhoneNumber(obj.getString("phone"));

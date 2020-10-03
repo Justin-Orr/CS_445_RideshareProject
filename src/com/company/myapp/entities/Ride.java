@@ -1,5 +1,7 @@
 package com.company.myapp.entities;
 
+import org.json.JSONObject;
+
 import com.company.myapp.utilities.UniqueIdGenerator;
 
 public class Ride {
@@ -23,6 +25,14 @@ public class Ride {
 		this.location = location;
 		this.dateTime = dateTime;
 		this.vehicle = vehicle;
+	}
+	
+	public JSONObject toJson() {
+		JSONObject obj = new JSONObject();
+		obj.put("rid", rid);
+		obj.put("location_info", location.toJson());
+		obj.put("date_time", dateTime.toJson());
+		return obj;
 	}
 
 	public int getRid() {

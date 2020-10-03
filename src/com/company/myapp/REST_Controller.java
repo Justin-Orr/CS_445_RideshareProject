@@ -215,7 +215,7 @@ public class REST_Controller {
 		
 	}
 	
-	@Path("/accounts/{aid}/ratings")
+	/*@Path("/accounts/{aid}/ratings")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -281,6 +281,20 @@ public class REST_Controller {
 		}
 		
 	}
+	
+	@Path("/accounts/{aid}/ratings/driver")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response viewDriverRatings(@Context UriInfo uriInfo) {
+		
+	}
+	
+	@Path("/accounts/{aid}/ratings/rider")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response viewRiderRatings(@Context UriInfo uriInfo) {
+		
+	}*/
 	
 	@Path("/rides")
 	@POST
@@ -352,7 +366,7 @@ public class REST_Controller {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response viewRide(@PathParam("rid") String id) {
 		String output = "";
-		Ride r = rri.getRide(Integer.valueOf(id));
+		Ride r = ride_repo.getRide(Integer.valueOf(id));
 		
 		if(r == null) {
 			output = JSONValidator.validationErrorResponse("Ride not found", "/rides/" + id, 404).toString();
@@ -360,14 +374,68 @@ public class REST_Controller {
 		}
 		
 		//Grab associated account for details
-		Account a = ari.getAccount(r.getDriverID());
+		Account a = account_repo.getAccount(r.getDriverID());
 		
 		if(a == null) {
-			output = JSONValidator.validationErrorResponse("Account identified by ride not found", "/rides/" + id, 404).toString();
+			output = JSONValidator.validationErrorResponse("Driver account identified by ride does not exist", "/rides/" + id, 404).toString();
 			return Response.status(Response.Status.NOT_FOUND).entity(output).build();
 		}
 		
 		//Grab associated account ratings for details
+		FIX ME, need driver comments from ratings repo
+		
+	}*/
+	
+	/*@Path("/rides")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response searchRides(@Context UriInfo uriInfo) {
+		
+	}
+	
+	@Path("/rides/{rid}")
+	@PUT
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateRide(@Context UriInfo uriInfo, String json) {
+		
+	}
+	
+	@Path("/rides/{rid}")
+	@DELETE
+	public Response deleteRide(@PathParam("rid") String id) {
+		
+	}
+	
+	@Path("/rides/{rid}/join_requests")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response requestToJoinRide(@Context UriInfo uriInfo, String json) {
+		
+	}
+	
+	@Path("/rides/{rid}/join_requests/{jid}")
+	@PATCH
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response replyToRideRequest(@Context UriInfo uriInfo, String json) {
+		//Used to reply to requests and confirm pickup
+	}
+	
+	@Path("/rides/{rid}/messages")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addMessageToRide(@Context UriInfo uriInfo, String json) {
+		
+	}
+	
+	@Path("/rides/{rid}/messages")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addMessageToRide(@Context UriInfo uriInfo) {
+		
 	}*/
 	
 }

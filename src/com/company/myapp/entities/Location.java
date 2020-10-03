@@ -1,5 +1,7 @@
 package com.company.myapp.entities;
 
+import org.json.JSONObject;
+
 public class Location {
 	
 	private String fromCity, fromZip, toCity, toZip;
@@ -13,6 +15,15 @@ public class Location {
 		this.fromZip = fromZip;
 		this.toCity = toCity;
 		this.toZip = toZip;
+	}
+	
+	public JSONObject toJson() {
+		JSONObject obj = new JSONObject();
+		obj.put("from_city", fromCity);
+		obj.put("from_zip", fromZip);
+		obj.put("to_city", toCity);
+		obj.put("to_zip", toZip);
+		return obj;
 	}
 
 	public String getFromCity() {
