@@ -1,12 +1,15 @@
 package com.company.myapp;
 
+import org.json.JSONObject;
+
 public class AppTest {
 
 	public static void main(String[] args) {
-		AccountRepository ar = new AccountRepository();
-		ar.creatAccount("Jane", "Doe", "708-600-8360", "www.example.com");
-		ar.creatAccount("Larry", "Doe", "123-456-7890", "www.java.com");
-		System.out.println(ar.searchAccounts("708-600-8360"));
+		//JSONObject obj = new JSONObject("{amount_per_passenger: 15.00}");
+		//double a = obj.getDouble("amount_per_passenger");
+		//System.out.println(a);
+		
+		System.out.println(DataPatternFormatter.validateTime("09:00"));
 	}
 
 }

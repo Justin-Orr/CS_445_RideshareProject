@@ -8,7 +8,8 @@ import org.json.JSONObject;
 @Path("/sar")
 public class REST_Controller {
 	
-	AccountRepository abi = new AccountRepository();
+	AccountRepositoryInterface ari = new AccountRepository();
+	RideRepositoryInterface rri = new RideRepository();
 	
 	@GET
     @Produces("text/plain")
@@ -49,7 +50,7 @@ public class REST_Controller {
 			String last_name = jsonObject.getString("last_name"); 
 			String phone_number = jsonObject.getString("phone"); 
 			String picture = jsonObject.getString("picture");
-			int id = abi.creatAccount(first_name, last_name, phone_number, picture);
+			int id = ari.createAccount(first_name, last_name, phone_number, picture);
 			
 			//Create response json
 			JSONObject obj = new JSONObject();
@@ -75,11 +76,11 @@ public class REST_Controller {
 		String output;
 		
 		if(key == null)
-			output = abi.viewAllAccounts();
+			output = ari.viewAllAccounts();
 		else if(key.compareTo("") == 0)
-			output = abi.viewAllAccounts();
+			output = ari.viewAllAccounts();
 		else
-			output = abi.searchAccounts(key);
+			output = ari.searchAccounts(key);
 		
 		return Response.status(Response.Status.OK).entity(output).build();
 	}
@@ -90,7 +91,7 @@ public class REST_Controller {
 	public Response viewAccount(@PathParam("aid") String id) {
 		
 		String output = "";
-		Account a = abi.getAccount(Integer.valueOf(id));
+		Account a = ari.getAccount(Integer.valueOf(id));
 		
 		if(a == null) {
 			output = JSONValidator.validationErrorResponse("Account not found", "/accounts/" + id, 404).toString();
@@ -141,14 +142,14 @@ public class REST_Controller {
 			}
 			else {
 				//Update account information
-				Account a = abi.getAccount(Integer.valueOf(id));
+				Account a = ari.getAccount(Integer.valueOf(id));
 				
 				if(a == null) {
 					output = JSONValidator.validationErrorResponse("Account not found", "/accounts/" + id + "/status", 404).toString();
 					return Response.status(Response.Status.NOT_FOUND).entity(output).build();
 				}
 				
-				abi.updateAccount(a, jsonObject);		 
+				ari.updateAccount(a, jsonObject);		 
 				return Response.noContent().build();
 			}
 		}
@@ -193,51 +194,66 @@ public class REST_Controller {
 			}
 			else {
 			
-				Account a = abi.getAccount(Integer.valueOf(id));
+				Account a = ari.getAccount(Integer.valueOf(id));
 				
 				if(a == null) {
 					output = JSONValidator.validationErrorResponse("Account not found", "/accounts/" + id + "/status", 404).toString();
 					return Response.status(Response.Status.NOT_FOUND).entity(output).build();
 				}
 				
-				abi.activateAccount(Integer.valueOf(id));
+				ari.activateAccount(Integer.valueOf(id));
 				return Response.ok().build();
 			}
 		}
 		
 	}
 	
-	/*@Path("/rides")
+	@Path("/rides")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createRide(@Context UriInfo uriInfo, String json) {
 		String output;
+		String error_message;
+		//Check if the input was a proper json at all
+		JSONValidatorCode error_code = JSONValidator.validJson(json);
 		
 		//Check if the input was a proper json at all
-		int error_code = validJson(json);
-		
-		if(error_code == -1) {
-			output = validationErrorResponse("JSON syntax error", "/rides", 400).toString();
+		if(error_code == JSONValidatorCode.INVALID_JSON) {
+			error_message = JSONValidator.generateErrorMessage(error_code);
+			output = JSONValidator.validationErrorResponse(error_message, "/rides", 400).toString();
 			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
 		}
 		
-		//Create new json object out of input
+		//Check if json is a valid ride json.
 		JSONObject jsonObject = new JSONObject(json);
+		error_code = JSONValidator.validRideJson(jsonObject);
 		
-		//Check if json is a valid account json.
-		error_code = validRideJson(jsonObject);
-		
-		if(error_code == 0) {
-			String first_name = jsonObject.getString("first_name"); 
-			String last_name = jsonObject.getString("last_name"); 
-			String phone_number = jsonObject.getString("phone"); 
-			String picture = jsonObject.getString("picture");
-			int id = abi.creatAccount(first_name, last_name, phone_number, picture);
+		if(error_code != JSONValidatorCode.VALID) {
+			error_message = JSONValidator.generateErrorMessage(error_code);
+			output = JSONValidator.validationErrorResponse(error_message, "/rides", 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
+		else {
+			//Create ride object
+			int driverID = jsonObject.getInt("aid");
+			int maxNumberOfPassengers = jsonObject.getInt("max_passengers");
+			double ammountPerPerson = jsonObject.getDouble("amount_per_passenger");
+			String conditions = jsonObject.getString("conditions");
+			
+			JSONObject loc = jsonObject.getJSONObject("location_info");
+			Location location = new Location(loc.getString("from_city"), loc.getString("from_zip"), loc.getString("to_city"),loc.getString("to_zip"));
+			
+			JSONObject dat = jsonObject.getJSONObject("date_time");
+			DateTime dateTime = new DateTime(dat.getString("date"), dat.getString("time"));
+			
+			JSONObject veh = jsonObject.getJSONObject("car_info");
+			Vehicle vehicle = new Vehicle(veh.getString("make"), veh.getString("model"), veh.getString("color"), veh.getString("plate_state"), veh.getString("plate_serial"));
+			int id = rri.createRide(driverID, maxNumberOfPassengers, ammountPerPerson, location, dateTime, vehicle, conditions);
 			
 			//Create response json
 			JSONObject obj = new JSONObject();
-			obj.put("aid", id);
+			obj.put("rid", id);
 			output = obj.toString();
 			 
 			// Build the URI for the "Location:" header
@@ -246,31 +262,7 @@ public class REST_Controller {
 			
 			return Response.status(Response.Status.CREATED).entity(output).build();
 		}
-		else if(error_code == 1) {
-			output = validationErrorResponse("Invalid first name", "/rides", 400).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
-		else if(error_code == 2) {
-			output = validationErrorResponse("Invalid last name", "/rides", 400).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
-		else if(error_code == 3) {
-			output = validationErrorResponse("Invalid phone number", "/rides", 400).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
-		else if(error_code == 4) {
-			output = validationErrorResponse("Invalid picture URL/filetype", "/rides", 400).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
-		else if(error_code == 5) {
-			output = validationErrorResponse("Invalid value for is_active", "/rides", 400).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
-		else {
-			output = validationErrorResponse("Unhandled_error_code", "/rides", 500).toString();
-			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
-		}
 	
-	}*/	
+	}	
 	
 }

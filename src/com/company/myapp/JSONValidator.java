@@ -71,6 +71,7 @@ public class JSONValidator {
 				return error_code = JSONValidatorCode.INVALID_FIRST_NAME;
 		}
 		catch(NullPointerException | JSONException e ) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_FIRST_NAME;
 		}
 		
@@ -80,6 +81,7 @@ public class JSONValidator {
 				return error_code = JSONValidatorCode.INVALID_LAST_NAME;
 		}
 		catch(NullPointerException | JSONException e) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_LAST_NAME;
 		}
 		
@@ -89,6 +91,7 @@ public class JSONValidator {
 				return error_code = JSONValidatorCode.INVALID_PHONE_NUMBER;
 		}
 		catch(NullPointerException | JSONException e) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_PHONE_NUMBER;
 		}
 		
@@ -98,6 +101,7 @@ public class JSONValidator {
 				return error_code = JSONValidatorCode.INVALID_PICTURE;
 		}
 		catch(NullPointerException | JSONException e) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_PICTURE;
 		}
 		
@@ -105,6 +109,7 @@ public class JSONValidator {
 			boolean is_active = json.getBoolean("is_active");
 		}
 		catch(NullPointerException | JSONException e) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_ACTIVE_VALUE;
 		}
 	
@@ -122,6 +127,7 @@ public class JSONValidator {
 			int aid = json.getInt("aid");
 		}
 		catch(NullPointerException | JSONException e ) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_NUMBER;
 		}
 		
@@ -129,13 +135,15 @@ public class JSONValidator {
 			int max_passengers = json.getInt("max_passengers"); 
 		}
 		catch(NullPointerException | JSONException e) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_MAX_PASSENGERS;
 		}
 		
 		try {
-			double ammount_per_passenger = json.getDouble("ammount_per_passenger"); 
+			double ammount_per_passenger = json.getDouble("amount_per_passenger"); 
 		}
 		catch(NullPointerException | JSONException e) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_AMMOUNT_PER_PERSON;
 		}
 		
@@ -143,6 +151,7 @@ public class JSONValidator {
 			String conditions = json.getString("conditions");
 		}
 		catch(NullPointerException | JSONException e) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_CONDITIONS;
 		}
 		
@@ -151,6 +160,7 @@ public class JSONValidator {
 			locationObject = json.getJSONObject("location_info");
 		}
 		catch(NullPointerException | JSONException e) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_JSON;
 		}
 		
@@ -164,6 +174,7 @@ public class JSONValidator {
 			dateTimeObject = json.getJSONObject("date_time");
 		}
 		catch(NullPointerException | JSONException e) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_JSON;
 		}
 		
@@ -177,6 +188,7 @@ public class JSONValidator {
 			vehicleObject = json.getJSONObject("car_info");
 		}
 		catch(NullPointerException | JSONException e) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_JSON;
 		}
 		
@@ -186,8 +198,6 @@ public class JSONValidator {
 	}
 	
 	//Checks the incoming json to see if it is valid for a location.
-	@SuppressWarnings("unused")
-	//Checks the incoming json to see if is valid for an location.
 	public static JSONValidatorCode validLocationJson(JSONObject json) {
 		
 		JSONValidatorCode error_code = JSONValidatorCode.VALID;
@@ -198,6 +208,7 @@ public class JSONValidator {
 				return error_code = JSONValidatorCode.INVALID_FROM_CITY;
 		}
 		catch(NullPointerException | JSONException e ) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_FROM_CITY;
 		}
 		
@@ -210,6 +221,7 @@ public class JSONValidator {
 			}
 		}
 		catch(NullPointerException | JSONException e) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_FROM_ZIP;
 		}
 		
@@ -219,6 +231,7 @@ public class JSONValidator {
 				return error_code = JSONValidatorCode.INVALID_TO_CITY;
 		}
 		catch(NullPointerException | JSONException e) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_TO_CITY;
 		}
 		
@@ -231,6 +244,7 @@ public class JSONValidator {
 			}
 		}
 		catch(NullPointerException | JSONException e) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_TO_ZIP;
 		}
 	
@@ -240,7 +254,6 @@ public class JSONValidator {
 	//Checks the incoming json to see if it is valid for a date/time.
 	public static JSONValidatorCode validDateTimeJson(JSONObject json) {
 	
-		@SuppressWarnings("unused")
 		JSONValidatorCode error_code = JSONValidatorCode.VALID;
 		
 		try {
@@ -249,6 +262,7 @@ public class JSONValidator {
 				return error_code = JSONValidatorCode.INVALID_DATE;
 		}
 		catch(NullPointerException | JSONException e ) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_DATE;
 		}
 		
@@ -258,6 +272,7 @@ public class JSONValidator {
 				return error_code = JSONValidatorCode.INVALID_TIME;
 		}
 		catch(NullPointerException | JSONException e) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_TIME;
 		}
 	
@@ -275,6 +290,7 @@ public class JSONValidator {
 				return error_code = JSONValidatorCode.INVALID_MAKE;
 		}
 		catch(NullPointerException | JSONException e ) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_MAKE;
 		}
 		
@@ -284,6 +300,7 @@ public class JSONValidator {
 				return error_code = JSONValidatorCode.INVALID_MODEL;
 		}
 		catch(NullPointerException | JSONException e) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_MODEL;
 		}
 		
@@ -293,6 +310,7 @@ public class JSONValidator {
 				return error_code = JSONValidatorCode.INVALID_COLOR;
 		}
 		catch(NullPointerException | JSONException e) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_COLOR;
 		}
 		
@@ -302,6 +320,7 @@ public class JSONValidator {
 				return error_code = JSONValidatorCode.INVALID_PLATE_STATE;
 		}
 		catch(NullPointerException | JSONException e) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_PLATE_STATE;
 		}
 		
@@ -311,6 +330,7 @@ public class JSONValidator {
 					return error_code = JSONValidatorCode.INVALID_PLATE_SERIAL;
 		}
 		catch(NullPointerException | JSONException e) {
+			e.printStackTrace();
 			return error_code = JSONValidatorCode.INVALID_PLATE_SERIAL;
 		}
 	

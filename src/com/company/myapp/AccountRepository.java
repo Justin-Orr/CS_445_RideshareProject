@@ -14,7 +14,7 @@ public class AccountRepository implements AccountRepositoryInterface {
 		//Default constructor
 	}
 	
-	public int creatAccount(String first_name, String last_name, String phone, String picture) {
+	public int createAccount(String first_name, String last_name, String phone, String picture) {
 		Account a = new Account(first_name, last_name, phone, picture);
 		repo.put(a.getAid(), a);
 		return a.getAid();

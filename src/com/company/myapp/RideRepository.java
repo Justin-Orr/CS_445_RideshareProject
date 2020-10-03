@@ -14,7 +14,7 @@ public class RideRepository implements RideRepositoryInterface {
 		//Default constructor
 	}
 	
-	public int creatAccount(int driverID, int maxNumberOfPassengers, double ammountPerPerson, Location location, DateTime dateTime, Vehicle vehicle, String conditions) {
+	public int createRide(int driverID, int maxNumberOfPassengers, double ammountPerPerson, Location location, DateTime dateTime, Vehicle vehicle, String conditions) {
 		Ride r = new Ride(driverID, maxNumberOfPassengers, ammountPerPerson, location, dateTime, vehicle, conditions);
 		repo.put(r.getRid(), r);
 		return r.getRid();
