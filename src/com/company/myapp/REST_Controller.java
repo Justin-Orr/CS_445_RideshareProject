@@ -263,7 +263,7 @@ public class REST_Controller {
 			}
 			
 			//Check if sender was apart of the ride
-			FIX ME
+			//FIX ME
 			
 			//Create rating
 			int id = rate_repo.rateAccount(rid, sent_by_id, rating, comment);
@@ -280,9 +280,9 @@ public class REST_Controller {
 			return Response.status(Response.Status.CREATED).entity(output).build();
 		}
 		
-	}
+	}*/
 	
-	@Path("/accounts/{aid}/ratings/driver")
+	/*@Path("/accounts/{aid}/ratings/driver")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response viewDriverRatings(@Context UriInfo uriInfo) {
@@ -391,23 +391,77 @@ public class REST_Controller {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response searchRides(@Context UriInfo uriInfo) {
 		
-	}
+	}*/
 	
 	@Path("/rides/{rid}")
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateRide(@Context UriInfo uriInfo, String json) {
+	public Response updateRide(@PathParam("rid") String rid, String json) {
+		String output;
+		String error_message;
+		Ride r = ride_repo.getRide(Integer.parseInt(rid));
+		if(r == null) {
+			output = JSONValidator.validationErrorResponse("Ride not found", "/rides/" + rid, 404).toString();
+			return Response.status(Response.Status.NOT_FOUND).entity(output).build();
+		}
 		
+		//Check if the input was a proper json at all
+		JSONValidatorCode error_code = JSONValidator.validJson(json);
+		
+		//Check if the input was a proper json at all
+		if(error_code == JSONValidatorCode.INVALID_JSON) {
+			error_message = JSONValidator.generateErrorMessage(error_code);
+			output = JSONValidator.validationErrorResponse(error_message, "/rides/" + rid, 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
+		
+		//Check if json is a valid ride json.
+		JSONObject jsonObject = new JSONObject(json);
+		error_code = JSONValidator.validRideJson(jsonObject);
+		
+		if(error_code != JSONValidatorCode.VALID) {
+			error_message = JSONValidator.generateErrorMessage(error_code);
+			output = JSONValidator.validationErrorResponse(error_message, "/rides/" + rid, 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
+		else {
+			//Check if account listed exists
+			int aid = jsonObject.getInt("aid");
+			
+			Account a = account_repo.getAccount(aid);
+			if(a == null) {
+				output = JSONValidator.validationErrorResponse("Account not found", "/rides/" + rid, 404).toString();
+				return Response.status(Response.Status.NOT_FOUND).entity(output).build();
+			}
+			
+			//Verify account is the driver
+			if(r.getDriverID() != aid) {
+				output = JSONValidator.validationErrorResponse("Only the creator of the ride may change it", "/rides/" + rid, 400).toString();
+				return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+			}
+			
+			//Update Ride
+			ride_repo.updateRide(r, jsonObject);
+			return Response.noContent().build(); 
+		}
 	}
 	
 	@Path("/rides/{rid}")
 	@DELETE
-	public Response deleteRide(@PathParam("rid") String id) {
-		
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteRide(@PathParam("rid") String rid) {
+		String output;
+		Ride r = ride_repo.getRide(Integer.parseInt(rid));
+		if(r == null) {
+			output = JSONValidator.validationErrorResponse("Ride not found", "/rides/" + rid, 404).toString();
+			return Response.status(Response.Status.NOT_FOUND).entity(output).build();
+		}
+		ride_repo.deleteRide(Integer.parseInt(rid));
+		return Response.noContent().build();
 	}
 	
-	@Path("/rides/{rid}/join_requests")
+	/*@Path("/rides/{rid}/join_requests")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)

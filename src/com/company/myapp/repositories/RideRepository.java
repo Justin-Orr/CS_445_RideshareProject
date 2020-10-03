@@ -40,7 +40,7 @@ public class RideRepository implements RideRepositoryInterface {
 		return obj.toString();
 	}
 	
-	public String searchAccounts(String key) {
+	/*public String searchAccounts(String key) {
 		JSONArray obj = new JSONArray();
 		String out = "";
 		ArrayList<Account> accounts = new ArrayList<Account>(repo.values());
@@ -51,14 +51,30 @@ public class RideRepository implements RideRepositoryInterface {
 			}	
 		}
 		return obj.toString();
+	}*/
+	
+	public void updateRide(Ride r, JSONObject obj) {
+		r.setMaxNumberOfPassengers(obj.getInt("max_passengers"));
+		r.setAmmountPerPerson(obj.getDouble("amount_per_passenger"));
+		r.setConditions(obj.getString("conditions"));
+		
+		JSONObject loc = obj.getJSONObject("location_info");
+		Location location = new Location(loc.getString("from_city"), loc.getString("from_zip"), loc.getString("to_city"),loc.getString("to_zip"));
+		r.setLocation(location);
+		
+		JSONObject dat = obj.getJSONObject("date_time");
+		DateTime dateTime = new DateTime(dat.getString("date"), dat.getString("time"));
+		r.setDateTime(dateTime);
+		
+		JSONObject veh = obj.getJSONObject("car_info");
+		Vehicle vehicle = new Vehicle(veh.getString("make"), veh.getString("model"), veh.getString("color"), veh.getString("plate_state"), veh.getString("plate_serial"));
+		r.setVehicle(vehicle);
+		
+		repo.replace(r.getDriverID(), r);
 	}
 	
-	/*public void updateAccount(Account a, JSONObject obj) {
-		a.setFirstName(obj.getString("first_name"));
-		a.setLastName(obj.getString("last_name"));
-		a.setPhoneNumber(obj.getString("phone"));
-		a.setPicture(obj.getString("picture"));
-		repo.replace(a.getAid(), a);
-	}*/
+	public void deleteRide(int rid) {
+		repo.remove(rid);
+	}
 	
 }

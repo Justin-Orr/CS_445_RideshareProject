@@ -23,24 +23,14 @@ private static Hashtable<Integer, Rating> repo = new Hashtable<Integer, Rating>(
 		return r.getSid();
 	}
 	
-	public Rating getAccount(int sid) {
+	public Rating getRating(int sid) {
 		return repo.get(sid);
 	}
 	
-	/*public String viewAllAccounts() {
-		JSONArray obj = new JSONArray();
-		ArrayList<Account> accounts = new ArrayList<Account>(repo.values());
-		for(Account a : accounts) {
-			String out = a.toPrettyJson().toString();
-			obj.put(new JSONObject(out)); //Make a Json array of json objects with a summary of the accounts, not all data
-		}
-		return obj.toString();
-	}
-	
-	public String searchAccounts(String key) {
+	/*public String searchAccounts(String key) {
 		JSONArray obj = new JSONArray();
 		String out = "";
-		ArrayList<Account> accounts = new ArrayList<Account>(repo.values());
+		ArrayList<Rating> accounts = new ArrayList<Rating>(repo.values());
 		for(Account a : accounts) {
 			if(key.compareToIgnoreCase(a.getFirstName()) == 0 || key.compareToIgnoreCase(a.getLastName()) == 0 || key.compareToIgnoreCase(a.getPhoneNumber()) == 0) {
 				out = a.toPrettyJson().toString();
