@@ -43,6 +43,8 @@ public class JSONValidator {
 			case INVALID_MAX_PASSENGERS: return "Invalid number of passengers";
 			case INVALID_AMMOUNT_PER_PERSON: return "Invalid amount per person";
 			case INVALID_CONDITIONS: return "Invalid condition statement";
+			case INVALID_RIDE_CONFIRMED_VALUE: return "Invalid value for ride_confirmed";
+			case INVALID_PICKUP_CONFIRMED_VALUE: return "Invalid value for pickup_confirmed";
 			case VALID: return "No error";
 			default: return "Unknown error code for JSONValidator message generator";
 		}
@@ -382,5 +384,73 @@ public class JSONValidator {
 	
 		return error_code;
 	}
+	
+	@SuppressWarnings("unused")
+	//Checks the incoming json to see if it is valid for a ride request.
+	public static JSONValidatorCode validRideRequestJson(JSONObject json) {
+		JSONValidatorCode error_code = JSONValidatorCode.VALID;
+		
+		try {
+			int aid = json.getInt("aid");
+		}
+		catch(NullPointerException | JSONException e ) {
+			e.printStackTrace();
+			return error_code = JSONValidatorCode.INVALID_NUMBER;
+		}
+		
+		try {
+			int passengers = json.getInt("passengers");
+		}
+		catch(NullPointerException | JSONException e ) {
+			e.printStackTrace();
+			return error_code = JSONValidatorCode.INVALID_NUMBER;
+		}
+		
+		try {
+			Object ride_confirmed = json.get("ride_confirmed");
+		}
+		catch(JSONException e ) {
+			e.printStackTrace();
+			return error_code = JSONValidatorCode.INVALID_RIDE_CONFIRMED_VALUE;
+		}
+		catch(NullPointerException e) {
+			//Do nothing: we want this to start null upon input from client
+		}
+		
+		try {
+			Object pickup_confirmed = json.get("pickup_confirmed");
+		}
+		catch(JSONException e ) {
+			e.printStackTrace();
+			return error_code = JSONValidatorCode.INVALID_PICKUP_CONFIRMED_VALUE;
+		}
+		catch(NullPointerException e) {
+			//Do nothing: we want this to start null upon input from client
+		}
+	
+		return error_code;
+	}
 
+	@SuppressWarnings("unused")
+	public static JSONValidatorCode validConfirmDenyRequestJson(JSONObject json) {
+		JSONValidatorCode error_code = JSONValidatorCode.VALID;
+		
+		try {
+			int aid = json.getInt("aid");
+		}
+		catch(NullPointerException | JSONException e ) {
+			e.printStackTrace();
+			return error_code = JSONValidatorCode.INVALID_NUMBER;
+		}
+		
+		try {
+			boolean ride_confirmed = json.getBoolean("ride_confirmed");
+		}
+		catch(NullPointerException | JSONException e ) {
+			e.printStackTrace();
+			return error_code = JSONValidatorCode.INVALID_RIDE_CONFIRMED_VALUE;
+		}
+		
+		return error_code;
+	}
 }

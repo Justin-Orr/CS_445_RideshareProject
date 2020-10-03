@@ -3,31 +3,30 @@ package com.company.myapp.repositories;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.company.myapp.entities.Account;
+import com.company.myapp.entities.RideRequest;
 import com.company.myapp.interfaces.RideRequestRepositoryInterface;
 
 public class RideRequestRepository implements RideRequestRepositoryInterface {
 	
-private static Hashtable<Integer, Account> repo = new Hashtable<Integer, Account>();
+private static Hashtable<Integer, RideRequest> repo = new Hashtable<Integer, RideRequest>();
 	
 	public RideRequestRepository() {
 		//Default constructor
 	}
 	
-	public int createAccount(String first_name, String last_name, String phone, String picture) {
-		Account a = new Account(first_name, last_name, phone, picture);
-		repo.put(a.getAid(), a);
-		return a.getAid();
+	public int createRideRequest(int rid, int aid, int passengers, boolean ride_confirmed, boolean pickup_confirmed) {
+		RideRequest r = new RideRequest(rid, aid, passengers, ride_confirmed, pickup_confirmed);
+		repo.put(r.getJid(), r);
+		return r.getRid();
 	}
 	
-	public Account getAccount(int aid) {
-		return repo.get(aid);
+	public RideRequest getRequest(int rid) {
+		return repo.get(rid);
 	}
 	
-	public String viewAllAccounts() {
+	/*public String viewAllAccounts() {
 		JSONArray obj = new JSONArray();
 		ArrayList<Account> accounts = new ArrayList<Account>(repo.values());
 		for(Account a : accounts) {
@@ -48,25 +47,11 @@ private static Hashtable<Integer, Account> repo = new Hashtable<Integer, Account
 			}	
 		}
 		return obj.toString();
-	}
+	}*/
 	
-	public void updateAccount(Account a, JSONObject obj) {
-		a.setFirstName(obj.getString("first_name"));
-		a.setLastName(obj.getString("last_name"));
-		a.setPhoneNumber(obj.getString("phone"));
-		a.setPicture(obj.getString("picture"));
-		repo.replace(a.getAid(), a);
-	}
-	
-	public int activateAccount(int aid) {
-		Account a = getAccount(aid);
-		if(a == null) {
-			return -1;
-		}
-		else {
-			a.setActive(true);
-			return 0;
-		}
+	public void confirmDenyRequest(RideRequest rr, JSONObject obj) {
+		rr.setRide_confirmed(obj.getBoolean("ride_confirmed"));
+		repo.replace(rr.getJid(), rr);
 	}
 	
 }
