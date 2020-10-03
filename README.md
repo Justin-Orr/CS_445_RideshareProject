@@ -1,0 +1,1 @@
+The following project is incomplete but based off of the following api: http://cs.iit.edu/~virgil/cs445/mail.spring2020/project/project-api.html The methods uncommented in the REST_Controller.java file have been implemented. The commented functions have yet to be implemented.
