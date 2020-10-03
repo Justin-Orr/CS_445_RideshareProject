@@ -40,18 +40,38 @@ public class RideRepository implements RideRepositoryInterface {
 		return obj.toString();
 	}
 	
-	/*public String searchAccounts(String key) {
-		JSONArray obj = new JSONArray();
-		String out = "";
-		ArrayList<Account> accounts = new ArrayList<Account>(repo.values());
-		for(Account a : accounts) {
-			if(key.compareToIgnoreCase(a.getFirstName()) == 0 || key.compareToIgnoreCase(a.getLastName()) == 0 || key.compareToIgnoreCase(a.getPhoneNumber()) == 0) {
-				out = a.toPrettyJson().toString();
-				obj.put(new JSONObject(out)); //Make a Json array of json objects with a summary of the accounts, not all data
-			}	
+	public String searchRides(String from, String to, String date) {
+		
+		//Are any of the attributes empty?
+		boolean emptyFrom = from.compareToIgnoreCase("") == 0;
+		boolean emptyTo = to.compareToIgnoreCase("") == 0;
+		boolean emptyDate = date.compareToIgnoreCase("") == 0;
+		
+		if(emptyFrom && emptyTo && emptyDate) {
+			return viewAllRides();
 		}
-		return obj.toString();
-	}*/
+		else if(emptyFrom && !emptyTo && !emptyDate) {
+			return searchEmpty_From(to, date);
+		}
+		else if(!emptyFrom && emptyTo && !emptyDate) {
+			return searchEmpty_To(from, date);
+		}
+		else if(!emptyFrom && !emptyTo && emptyDate) {
+			return searchEmpty_Date(from, to);		
+		}
+		else if(emptyFrom && emptyTo && !emptyDate) {
+			return searchEmpty_From_To(date);
+		}
+		else if(emptyFrom && !emptyTo && emptyDate) {
+			return searchEmpty_From_Date(to);
+		}
+		else if(!emptyFrom && emptyTo && emptyDate) {
+			return searchEmpty_To_Date(from);
+		}
+		else {
+			return searchAllAttributes(from, to, date);
+		}
+	}
 	
 	public void updateRide(Ride r, JSONObject obj) {
 		r.setMaxNumberOfPassengers(obj.getInt("max_passengers"));
@@ -77,4 +97,107 @@ public class RideRepository implements RideRepositoryInterface {
 		repo.remove(rid);
 	}
 	
+	private String searchAllAttributes(String from, String to, String date) {
+		JSONArray obj = new JSONArray();
+		ArrayList<Ride> rides = new ArrayList<Ride>(repo.values());
+		Location loc;
+		DateTime dt;
+		for(Ride r : rides) {
+			loc = r.getLocation();
+			dt = r.getDateTime();
+			if(from.compareToIgnoreCase(loc.getFromCity()) == 0 && to.compareToIgnoreCase(loc.getToCity()) == 0 && date.compareToIgnoreCase(dt.getDate()) == 0) {
+				String out = r.toJson().toString();
+				obj.put(new JSONObject(out));
+			}
+		}
+		return obj.toString();
+	}
+	
+	private String searchEmpty_From(String to, String date) {
+		JSONArray obj = new JSONArray();
+		ArrayList<Ride> rides = new ArrayList<Ride>(repo.values());
+		Location loc;
+		DateTime dt;
+		for(Ride r : rides) {
+			loc = r.getLocation();
+			dt = r.getDateTime();
+			if(to.compareToIgnoreCase(loc.getToCity()) == 0 && date.compareToIgnoreCase(dt.getDate()) == 0) {
+				String out = r.toJson().toString();
+				obj.put(new JSONObject(out));
+			}
+		}
+		return obj.toString();
+	}
+	
+	private String searchEmpty_To(String from, String date) {
+		JSONArray obj = new JSONArray();
+		ArrayList<Ride> rides = new ArrayList<Ride>(repo.values());
+		Location loc;
+		DateTime dt;
+		for(Ride r : rides) {
+			loc = r.getLocation();
+			dt = r.getDateTime();
+			if(from.compareToIgnoreCase(loc.getFromCity()) == 0 && date.compareToIgnoreCase(dt.getDate()) == 0) {
+				String out = r.toJson().toString();
+				obj.put(new JSONObject(out));
+			}
+		}
+		return obj.toString();
+	}
+	
+	private String searchEmpty_Date(String from, String to) {
+		JSONArray obj = new JSONArray();
+		ArrayList<Ride> rides = new ArrayList<Ride>(repo.values());
+		Location loc;
+		for(Ride r : rides) {
+			loc = r.getLocation();
+			if(from.compareToIgnoreCase(loc.getFromCity()) == 0 && to.compareToIgnoreCase(loc.getToCity()) == 0) {
+				String out = r.toJson().toString();
+				obj.put(new JSONObject(out));
+			}
+		}
+		return obj.toString();
+	}
+	
+	private String searchEmpty_From_To(String date) {
+		JSONArray obj = new JSONArray();
+		ArrayList<Ride> rides = new ArrayList<Ride>(repo.values());
+		DateTime dt;
+		for(Ride r : rides) {
+			dt = r.getDateTime();
+			if(date.compareToIgnoreCase(dt.getDate()) == 0) {
+				String out = r.toJson().toString();
+				obj.put(new JSONObject(out));
+			}
+		}
+		return obj.toString();
+	}
+	
+	private String searchEmpty_From_Date(String to) {
+		JSONArray obj = new JSONArray();
+		ArrayList<Ride> rides = new ArrayList<Ride>(repo.values());
+		Location loc;
+		for(Ride r : rides) {
+			loc = r.getLocation();
+			if(to.compareToIgnoreCase(loc.getToCity()) == 0) {
+				String out = r.toJson().toString();
+				obj.put(new JSONObject(out));
+			}
+		}
+		return obj.toString();
+	}
+	
+	private String searchEmpty_To_Date(String from) {
+		JSONArray obj = new JSONArray();
+		ArrayList<Ride> rides = new ArrayList<Ride>(repo.values());
+		Location loc;
+		for(Ride r : rides) {
+			loc = r.getLocation();
+			if(from.compareToIgnoreCase(loc.getFromCity()) == 0) {
+				String out = r.toJson().toString();
+				obj.put(new JSONObject(out));
+			}
+		}
+		return obj.toString();
+	}
 }

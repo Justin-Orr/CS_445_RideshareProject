@@ -386,12 +386,39 @@ public class REST_Controller {
 		
 	}*/
 	
-	/*@Path("/rides")
+	@Path("/rides")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response searchRides(@Context UriInfo uriInfo) {
+		//Grab the query parameters if present
+		MultivaluedMap<String, String> params = uriInfo.getQueryParameters(); 
+		String from = params.getFirst("from");
+		String to = params.getFirst("to");
+		String date = params.getFirst("date");
+		String output;
 		
-	}*/
+		//Check the format of date
+		if(DataPatternFormatter.validateDate2(date) == -1) {
+			output = JSONValidator.validationErrorResponse("Invalid date", "/rides", 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
+		
+		if(from == null && to == null && date == null) {
+			output = ride_repo.viewAllRides();
+		}
+		else if(from.compareTo("") == 0 || to.compareTo("") == 0 || date.compareTo("") == 0) {
+			output = ride_repo.searchRides(from, to, date);
+		}
+		else if(from != null && to != null && date != null) {
+			output = ride_repo.searchRides(from, to, date);
+		}
+		else {
+			output = JSONValidator.validationErrorResponse("Invalid query: missing at least one attribute", "/rides", 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
+		
+		return Response.status(Response.Status.OK).entity(output).build();
+	}
 	
 	@Path("/rides/{rid}")
 	@PUT
