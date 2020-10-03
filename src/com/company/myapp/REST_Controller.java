@@ -17,6 +17,7 @@ public class REST_Controller {
 	AccountRepositoryInterface account_repo = new AccountRepository();
 	RideRepositoryInterface ride_repo = new RideRepository();
 	RatingRepositoryInterface rate_repo = new RatingRepository();
+	RideRequestRepositoryInterface request_repo = new RideRequestRepository();
 	
 	@GET
     @Produces("text/plain")
@@ -488,15 +489,53 @@ public class REST_Controller {
 		return Response.noContent().build();
 	}
 	
-	/*@Path("/rides/{rid}/join_requests")
+	@Path("/rides/{rid}/join_requests")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response requestToJoinRide(@Context UriInfo uriInfo, String json) {
+		String output;
+		String error_message;
+		JSONValidatorCode error_code = JSONValidator.validJson(json);
 		
+		//Check if the input was a proper json at all
+		if(error_code == JSONValidatorCode.INVALID_JSON) {
+			error_message = JSONValidator.generateErrorMessage(error_code);
+			output = JSONValidator.validationErrorResponse(error_message, uriInfo.getPath(), 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
+		
+		//Check if the json has an account format
+		JSONObject jsonObject = new JSONObject(json);
+		error_code = JSONValidator.validRideRequestJson(jsonObject);
+		
+		if(error_code != JSONValidatorCode.VALID) {
+			error_message = JSONValidator.generateErrorMessage(error_code);
+			output = JSONValidator.validationErrorResponse(error_message, uriInfo.getPath(), 400).toString();
+			return Response.status(Response.Status.BAD_REQUEST).entity(output).build();
+		}
+		/*else {
+			//Create an account
+			String first_name = jsonObject.getString("first_name"); 
+			String last_name = jsonObject.getString("last_name"); 
+			String phone_number = jsonObject.getString("phone"); 
+			String picture = jsonObject.getString("picture");
+			int id = account_repo.createAccount(first_name, last_name, phone_number, picture);
+			
+			//Create response json
+			JSONObject obj = new JSONObject();
+			obj.put("aid", id);
+			output = obj.toString();
+			 
+			// Build the URI for the "Location:" header
+			UriBuilder builder = uriInfo.getAbsolutePathBuilder();
+			builder.path(Integer.toString(id));
+			
+			return Response.status(Response.Status.CREATED).entity(output).build();
+		}*/
 	}
 	
-	@Path("/rides/{rid}/join_requests/{jid}")
+	/*@Path("/rides/{rid}/join_requests/{jid}")
 	@PATCH
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
