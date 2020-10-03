@@ -5,6 +5,12 @@ import javax.ws.rs.core.*;
 
 import org.json.JSONObject;
 
+import com.company.myapp.entities.*;
+import com.company.myapp.enums.*;
+import com.company.myapp.interfaces.*;
+import com.company.myapp.repositories.*;
+import com.company.myapp.utilities.*;
+
 @Path("/sar")
 public class REST_Controller {
 	
@@ -264,5 +270,28 @@ public class REST_Controller {
 		}
 	
 	}	
+	
+	@Path("/rides/{rid}")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response viewRide(@PathParam("rid") String id) {
+		String output = "";
+		Ride r = rri.getRide(Integer.valueOf(id));
+		
+		if(r == null) {
+			output = JSONValidator.validationErrorResponse("Ride not found", "/rides/" + id, 404).toString();
+			return Response.status(Response.Status.NOT_FOUND).entity(output).build();
+		}
+		
+		//Grab associated account for details
+		Account a = ari.getAccount(r.getDriverID());
+		
+		if(a == null) {
+			output = JSONValidator.validationErrorResponse("Account identified by ride not found", "/rides/" + id, 404).toString();
+			return Response.status(Response.Status.NOT_FOUND).entity(output).build();
+		}
+		
+		//Grab associated account ratings for details
+	}
 	
 }

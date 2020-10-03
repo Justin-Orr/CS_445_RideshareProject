@@ -2,6 +2,8 @@ package com.company.myapp;
 
 import org.json.JSONObject;
 
+import com.company.myapp.utilities.DataPatternFormatter;
+
 public class AppTest {
 
 	public static void main(String[] args) {
